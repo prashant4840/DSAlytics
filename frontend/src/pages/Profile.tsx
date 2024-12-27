@@ -73,23 +73,25 @@ export const Profile: React.FC<ProfileProps> = ({ user, setUser }) => {
   };
 
   useEffect(() => {
-    async function getPhoto() {
+    async function getUserData() {
       const token = localStorage.getItem("token");
       if (!token) {
         console.error("No token found in localStorage");
         return;
       }
-      const pfp = await axiosFetch.get(
+      const userData = await axiosFetch.get(
         `${import.meta.env.VITE_API_URL}/api/platform/pfp`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      console.log(pfp.data);
-      setProfilePhoto(pfp.data.gfg.data.profile_image_url);
+      console.log(userData.data);
+      setProfilePhoto(
+        userData.data.leetcode.data.matchedUser.profile.userAvatar
+      ); // todo make dynamic
     }
 
-    getPhoto();
+    getUserData();
   }, []);
 
   return (

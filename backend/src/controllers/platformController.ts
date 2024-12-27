@@ -1,61 +1,72 @@
 import { Request, Response } from "express";
-import axios from "axios";
-import User from "../models/userModel"; // Assuming you have a User model
+import User from "../models/userModel";
+import {
+  codeforcesData,
+  gfgData,
+  interviewbitData,
+  LeetcodeData,
+} from "../utils/platformData";
 
-const pfpAggrigate = async (req: Request, res: Response) => {
+const platformData = async (req: Request, res: Response) => {
   try {
     // @ts-ignore
     const { id } = req.user;
+
     const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    if (!user.usernames) {
+
+    const { usernames } = user;
+    if (!usernames) {
       return res.status(403).json({ error: "Usernames not found" });
     }
 
-    const usernames = user.usernames; // Assuming usernames are stored in the user document
+    const results: Record<string, any> = {};
 
-    const urls: { [key: string]: string } = {};
-
-    if (usernames?.gfg) {
-      urls.gfg = `${process.env.VITE_GFG}${usernames.gfg}`;
+    if (usernames.gfg) {
+      const gfgRes = await gfgData(usernames.gfg);
+      if (gfgRes) {
+        results.gfg = gfgRes;
+      } else {
+        return res.status(404).json({ error: "GFG data not found" });
+      }
     }
-    // if (usernames?.leetcode) {
-    //   urls.leetcode = `${process.env.VITE_LEETCODE}${usernames.leetcode}`;
-    // }
-    // if (usernames?.codechef) {
-    //   urls.codechef = `${process.env.VITE_CODECHEF}${usernames.codechef}`;
-    // }
-    if (usernames?.codeforces) {
-      urls.codeforces = `${process.env.VITE_CODEFORCES}${usernames.codeforces}`;
+
+    if (usernames.leetcode) {
+      const leetcodeRes = (await LeetcodeData(usernames.leetcode)) as any;
+      if (leetcodeRes) {
+        results.leetcode = leetcodeRes;
+      } else {
+        return res.status(404).json({ error: "Leetcode data not found" });
+      }
     }
-    // if (usernames?.interviewbit) {
-    //   urls.interviewbit = `${process.env.VITE_INTERVIEWBIT}${usernames.interviewbit}`;
-    // }
-    console.log(urls);
-    const requests = Object.entries(urls).map(([key, url]) =>
-      axios.get(url).then((response) => ({ key, data: response.data }))
-    );
 
-    const responses = await Promise.all(requests);
+    if (usernames.codeforces) {
+      const codeforcesRes = await codeforcesData(usernames.codeforces);
+      if (codeforcesRes) {
+        results.codeforces = codeforcesRes;
+      } else {
+        return res.status(404).json({ error: "Codeforces data not found" });
+      }
+    }
 
-    const result = responses.reduce((acc, response) => {
-      acc[response.key] = response.data;
-      return acc;
-    }, {} as { [key: string]: any });
+    if (usernames.interviewbit) {
+      const interviewbitRes = await interviewbitData(usernames.interviewbit);
+      if (interviewbitRes) {
+        results.interviewbit = interviewbitRes;
+      } else {
+        return res.status(404).json({ error: "InterviewBit data not found" });
+      }
+    }
 
-    // const result = await axios.get(
-    //   "https://codeforces.com/api/user.info?handles=nischalshetty02"
-    // );
-    // console.log(result);
-
-    res.json(result.data);
-  } catch (error) {
-    res.status(500).json({
-      error: "Failed to fetch data from one or more platforms" + error,
+    // console.dir(results, { depth: null });
+    return res.json(results);
+  } catch (error: any) {
+    return res.status(500).json({
+      error: `Failed to fetch data: ${error.message}`,
     });
   }
 };
 
-export default pfpAggrigate;
+export default platformData;
