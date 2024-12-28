@@ -12,7 +12,7 @@ const AboutAndPrivacy: React.FC = () => {
           share your achievements effortlessly.
         </p>
         <p className="text-lg leading-relaxed">
-          Track your progress across LeetCode, GeeksForGeeks, CodeChef, and
+          Track your progress across LeetCode, GeeksForGeeks, Codeforces, and
           more. Get insights, track improvements, and showcase your coding
           journey.
         </p>

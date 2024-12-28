@@ -12,16 +12,25 @@ export const PlatformCard = ({
 }: {
   platform: Platform;
   username?: string;
-  onUpdate: (platformId: string, username: string) => Promise<void>;
+  onUpdate: (
+    platformId: string,
+    username: string
+  ) => Promise<{ success: boolean } | undefined>;
   isLoading: boolean;
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newUsername, setNewUsername] = useState(username || "");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onUpdate(platform.id, newUsername);
-    setIsEditing(false);
+    const res = await onUpdate(platform.id, newUsername);
+    if (res?.success) {
+      setIsEditing(false);
+      setError("");
+    } else {
+      setError("Error finding username");
+    }
   };
 
   return (
@@ -56,7 +65,13 @@ export const PlatformCard = ({
         </button>
       </div>
 
-      <Modal isOpen={isEditing} onClose={() => setIsEditing(false)}>
+      <Modal
+        isOpen={isEditing}
+        onClose={() => {
+          setNewUsername(username || "");
+          setError("");
+          setIsEditing(false);
+        }}>
         <h2 className="text-xl font-semibold mb-4">
           {username ? "Update" : "Add"} {platform.name} Username
         </h2>
@@ -68,6 +83,7 @@ export const PlatformCard = ({
             placeholder="Enter username"
             className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+          {error && <p className="text-red-500">{error}</p>}
           <div className="flex space-x-2">
             <button
               type="submit"
@@ -77,7 +93,11 @@ export const PlatformCard = ({
             </button>
             <button
               type="button"
-              onClick={() => setIsEditing(false)}
+              onClick={() => {
+                setNewUsername(username || "");
+                setError("");
+                setIsEditing(false);
+              }}
               className="flex-1 border border-gray-300 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors">
               Cancel
             </button>

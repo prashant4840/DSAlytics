@@ -4,6 +4,6 @@ import platformData from "../controllers/platformController";
 
 const router = express.Router();
 
-router.get("/platform/pfp", protect as any, platformData as any);
+router.get("/platform/data", protect as any, platformData as any);
 
 export default router;

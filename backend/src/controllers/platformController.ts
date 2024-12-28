@@ -34,7 +34,7 @@ const platformData = async (req: Request, res: Response) => {
     }
 
     if (usernames.leetcode) {
-      const leetcodeRes = (await LeetcodeData(usernames.leetcode)) as any;
+      const leetcodeRes = await LeetcodeData(usernames.leetcode);
       if (leetcodeRes) {
         results.leetcode = leetcodeRes;
       } else {

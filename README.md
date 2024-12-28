@@ -1,6 +1,6 @@
 # DSA Stats
 
-DSAStats is an application that aggregates your DSA (Data Structures and Algorithms) statistics/ranks from platforms like LeetCode, GeeksforGeeks, and CodeChef etc into a unified and visually appealing dashboard. It simplifies progress tracking and allows you to share or download your stats in a beautiful way.
+DSAStats is an application that aggregates your DSA (Data Structures and Algorithms) statistics/ranks from platforms like LeetCode, GeeksforGeeks etc into a unified and visually appealing dashboard. It simplifies progress tracking and allows you to share or download your stats in a beautiful way.
 
 ## Features
 
@@ -84,7 +84,7 @@ The app will be available at `http://localhost:3000`.
 
 ## Usage
 
-1. Add your platform usernames (e.g., LeetCode, CodeChef).
+1. Add your platform usernames (e.g., LeetCode, gfg).
 2. View your unified stats dashboard.
 3. Share your stats page using the unique link or download a snapshot.
 

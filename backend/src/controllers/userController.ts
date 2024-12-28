@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import User from "../models/userModel";
 import generateToken from "../utils/generateTokens";
+import { verifyPlatformData } from "../utils/platformData";
 
 export const registerUser = async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
@@ -52,6 +53,11 @@ export const updateUsernames = async (
     const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
+    }
+    const verification = await verifyPlatformData(updates);
+
+    if (!verification.success) {
+      return res.status(400).json({ message: verification.error });
     }
 
     const updatedUsernames = { ...user.usernames, ...updates };

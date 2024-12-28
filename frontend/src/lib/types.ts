@@ -5,7 +5,6 @@ export interface User {
   usernames: {
     leetcode?: string;
     gfg?: string;
-    codechef?: string;
     interviewbit?: string;
     codeforces?: string;
   };
@@ -17,3 +16,26 @@ export interface Platform {
   name: string;
   logo: string;
 }
+
+export const PLATFORMS: Platform[] = [
+  {
+    id: "leetcode",
+    name: "LeetCode",
+    logo: "/leetcode.webp",
+  },
+  {
+    id: "gfg",
+    name: "GeeksForGeeks",
+    logo: "/gfg.png",
+  },
+  {
+    id: "interviewbit",
+    name: "InterviewBit",
+    logo: "/interviewbit.png",
+  },
+  {
+    id: "codeforces",
+    name: "CodeForces",
+    logo: "/codeforces.webp",
+  },
+];

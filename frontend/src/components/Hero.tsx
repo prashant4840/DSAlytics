@@ -25,7 +25,7 @@ export const Hero = () => {
         </motion.h1>
 
         <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl mx-auto animate-slide-down-slow">
-          Share your progress across LeetCode, GeeksForGeeks, CodeChef, and
+          Share your progress across LeetCode, GeeksForGeeks, Codeforces and
           more. showcase your coding journey in a single place. Get started now!
         </p>
         <div className="flex justify-center space-x-4 animate-slide-down-slow">

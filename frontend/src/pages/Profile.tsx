@@ -1,36 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Platform, User } from "../lib/types";
+import { PLATFORMS, User } from "../lib/types";
 import axiosFetch from "../lib/axiosFetch";
 import { PlatformCard } from "../components/PlatformCard";
-
-// Platform Configuration
-const PLATFORMS: Platform[] = [
-  {
-    id: "leetcode",
-    name: "LeetCode",
-    logo: "/leetcode.webp",
-  },
-  {
-    id: "gfg",
-    name: "GeeksForGeeks",
-    logo: "/gfg.png",
-  },
-  {
-    id: "codechef",
-    name: "CodeChef",
-    logo: "/codechef.png",
-  },
-  {
-    id: "interviewbit",
-    name: "InterviewBit",
-    logo: "/interviewbit.png",
-  },
-  {
-    id: "codeforces",
-    name: "CodeForces",
-    logo: "/codeforces.webp",
-  },
-];
+import { AxiosError } from "axios";
 
 interface ProfileProps {
   user: User | null;
@@ -65,8 +37,10 @@ export const Profile: React.FC<ProfileProps> = ({ user, setUser }) => {
 
       const updatedUser = response.data;
       setUser(updatedUser);
-    } catch (error) {
-      console.error("Error updating username:", error);
+      return { success: true };
+    } catch (error: AxiosError | any) {
+      console.error("Error updating username:", error.response?.data.message);
+      return { success: false };
     } finally {
       setLoadingPlatforms((prev) => ({ ...prev, [platformId]: false }));
     }
@@ -80,15 +54,28 @@ export const Profile: React.FC<ProfileProps> = ({ user, setUser }) => {
         return;
       }
       const userData = await axiosFetch.get(
-        `${import.meta.env.VITE_API_URL}/api/platform/pfp`,
+        `${import.meta.env.VITE_API_URL}/api/platform/data`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      console.log(userData.data);
-      setProfilePhoto(
-        userData.data.leetcode.data.matchedUser.profile.userAvatar
-      ); // todo make dynamic
+
+      const platformsData = userData.data;
+      const priorityOrder = ["leetcode", "interviewbit", "gfg", "codeforces"];
+      const pfp = localStorage.getItem("profilePhoto");
+      if (pfp) {
+        setProfilePhoto(pfp);
+        return;
+      }
+
+      for (const platform of priorityOrder) {
+        if (platformsData[platform]?.data.profile.userAvatar) {
+          const avatarUrl = platformsData[platform].data.profile.userAvatar;
+          setProfilePhoto(avatarUrl);
+          localStorage.setItem("profilePhoto", avatarUrl);
+          return;
+        }
+      }
     }
 
     getUserData();
@@ -110,7 +97,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, setUser }) => {
       </div>
 
       {/* Platform Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 max-w-6xl mx-auto">
         {PLATFORMS.map((platform) => (
           <PlatformCard
             key={platform.id}

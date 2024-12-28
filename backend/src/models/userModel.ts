@@ -7,7 +7,6 @@ const userSchema = new mongoose.Schema({
   usernames: {
     leetcode: String,
     gfg: String,
-    codechef: String,
     interviewbit: String,
     codeforces: String,
   },
