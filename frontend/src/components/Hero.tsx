@@ -1,8 +1,16 @@
 import { FilledButton, HollowButton } from "./ui/Button";
 import { Highlight } from "./ui/hero-highlight";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 export const Hero = () => {
+  const [hasAccount, setHasAccount] = useState<boolean>(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setHasAccount(!!token);
+  }, []);
+
   return (
     <div className="max-w-7xl mx-auto py-20 px-4 sm:px-6 lg:px-8">
       <div className="text-center">
@@ -29,7 +37,9 @@ export const Hero = () => {
           more. showcase your coding journey in a single place. Get started now!
         </p>
         <div className="flex justify-center space-x-4 animate-slide-down-slow">
-          <FilledButton to="/login">Create your profile</FilledButton>
+          <FilledButton to={!hasAccount ? "/signup" : "/profile"}>
+            {!hasAccount ? "Create your profile" : "View your profile"}
+          </FilledButton>
           <HollowButton to="/leaderboard">Leaderboard</HollowButton>
         </div>
       </div>

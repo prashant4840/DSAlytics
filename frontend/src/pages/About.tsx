@@ -6,7 +6,7 @@ const AboutAndPrivacy: React.FC = () => {
       <section className="max-w-3xl w-full mb-8">
         <h1 className="text-3xl font-bold mb-4">About</h1>
         <p className="text-lg leading-relaxed">
-          Welcome to DSA Stats! Our mission is to bring all your coding and DSA
+          Welcome to DSA Stats! My mission is to bring all your coding and DSA
           stats across multiple platforms into one beautifully designed
           interface. Stay organized and focused as you track your progress and
           share your achievements effortlessly.

@@ -81,12 +81,60 @@ export const verify = async (
   const { id } = req.user as { id: string }; // Extracted from auth middleware
 
   try {
-    const user = await User.findById(id).select("name email usernames");
+    const user = await User.findById(id).select("name email usernames pfp");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
     return res.json({ success: true, user });
   } catch (error) {
     return res.status(500).json({ message: "Error verifying user" });
+  }
+};
+
+export const setUserAvatar = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  // @ts-ignore
+  const { id } = req.user as { id: string }; // Extracted from auth middleware
+  const { avatarUrl } = req.body;
+
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    user.pfp = avatarUrl;
+
+    await user.save();
+
+    return res.json(user);
+  } catch (error) {
+    return res.status(500).json({ message: "Error setting user avatar" });
+  }
+};
+
+export const updateUserDetails = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  // @ts-ignore
+  const { id } = req.user as { id: string }; // Extracted from auth middleware
+  const { name, email } = req.body;
+
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (name) user.name = name;
+    if (email) user.email = email;
+
+    await user.save();
+
+    return res.json(user);
+  } catch (error) {
+    return res.status(500).json({ message: "Error updating user details" });
   }
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Mail } from "lucide-react";
@@ -10,6 +10,11 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) navigate("/profile");
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -20,7 +25,7 @@ const Login = () => {
 
       if (response.status === 200) {
         localStorage.setItem("token", response.data.token);
-        console.log("Login successful", response.data);
+        console.log("Login successful");
         navigate("/profile");
       } else {
         throw new Error(response.data.message);

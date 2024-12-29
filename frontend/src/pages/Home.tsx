@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Code2, BarChart2 } from "lucide-react";
 import { Hero } from "../components/Hero";
 import "./Home.css";
-
 import { IoShareSocial } from "react-icons/io5";
-import axiosFetch from "../lib/axiosFetch";
 
 interface FeatureCardProps {
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -28,30 +25,6 @@ const FeatureCard = ({ icon: Icon, title, description }: FeatureCardProps) => (
 
 const Home = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const verifyAuth = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axiosFetch.post<{
-          success: boolean;
-        }>(
-          "/api/user/verify",
-          {},
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        if (response.data.success) navigate("/profile");
-      } catch (error) {
-        console.error("Error verifying authentication:", error);
-      }
-    };
-
-    verifyAuth();
-  }, []);
 
   const handleMouseMove = (event: MouseEvent) => {
     const { clientX, clientY } = event;

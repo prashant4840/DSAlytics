@@ -60,7 +60,6 @@ const platformData = async (req: Request, res: Response) => {
       }
     }
 
-    // console.dir(results, { depth: null });
     return res.json(results);
   } catch (error: any) {
     return res.status(500).json({

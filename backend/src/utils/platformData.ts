@@ -11,7 +11,7 @@ export const verifyPlatformData = async (updates: TVerificationRequest) => {
 
   const platform = Object.keys(updates)[0].toLowerCase();
   const username = updates[platform];
-  let data = null;
+  let data: PlatformData | null = null;
 
   switch (platform) {
     case "gfg":
@@ -78,19 +78,13 @@ export const LeetcodeData = async (username: string) => {
     if (response.data.errors) {
       throw new Error("User not found");
     }
-    const combinedResponse: {
-      avatar: string;
-      totalProblemsSolved: number;
-      rating: number;
-      contestGlobalRank: number;
-      ranking: number;
-    } = {
+    const combinedResponse: PlatformData = {
       avatar: response.data.data.matchedUser.profile.userAvatar,
       totalProblemsSolved:
         response.data.data.matchedUser.submitStats.acSubmissionNum[0].count,
       rating: response.data.data.userContestRanking.rating,
       contestGlobalRank: response.data.data.userContestRanking.globalRanking,
-      ranking: response.data.data.matchedUser.profile.ranking,
+      rank: response.data.data.matchedUser.profile.ranking,
     };
 
     return combinedResponse;
@@ -103,11 +97,7 @@ export const LeetcodeData = async (username: string) => {
 export const gfgData = async (username: string) => {
   try {
     const response = await axios.get(`${process.env.VITE_GFG}${username}`);
-    const combinedResponse: {
-      avatar: string;
-      totalProblemsSolved: number;
-      universityRank?: number;
-    } = {
+    const combinedResponse: PlatformData = {
       avatar: response.data.data.profile_image_url,
       totalProblemsSolved: response.data.data.total_problems_solved,
       universityRank: response.data.data.institute_rank,
@@ -142,13 +132,7 @@ export const codeforcesData = async (username: string) => {
       ),
     ].length;
 
-    const combinedResponse: {
-      avatar: string;
-      totalProblemsSolved: number;
-      rating?: number;
-      rank?: string;
-      maxRating?: number;
-    } = {
+    const combinedResponse: PlatformData = {
       avatar: response.data.result[0].avatar,
       totalProblemsSolved: solvedProblemsCount,
     };
@@ -181,12 +165,7 @@ export const interviewbitData = async (username: string) => {
 
     const totalProblemsSolved = response2.data.total_problems_solved;
 
-    const combinedResponse: {
-      avatar: string;
-      rank: number;
-      totalProblemsSolved: number;
-      universityRank?: number;
-    } = {
+    const combinedResponse: PlatformData = {
       avatar,
       rank,
       totalProblemsSolved,
@@ -202,3 +181,13 @@ export const interviewbitData = async (username: string) => {
     return null;
   }
 };
+
+export interface PlatformData {
+  avatar: string;
+  totalProblemsSolved: number;
+  rating?: number;
+  rank?: string;
+  maxRating?: number;
+  universityRank?: number;
+  contestGlobalRank?: number;
+}

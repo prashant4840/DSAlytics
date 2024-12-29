@@ -44,7 +44,7 @@ export const Navbar = () => {
               Profile
             </Link>
             <Link to="/share" className={getLinkClasses("/share")}>
-              Share
+              Share Profile
             </Link>
             <Link to="/Leaderboard" className={getLinkClasses("/Leaderboard")}>
               Leaderboard
@@ -52,7 +52,7 @@ export const Navbar = () => {
             {isLoggedin && (
               <button
                 onClick={handleLogout}
-                className="text-black hover:text-indigo-600 transition-colors flex">
+                className="text-black border px-3 rounded-lg hover:text-indigo-600 transition-colors flex">
                 Log Out
               </button>
             )}
@@ -73,7 +73,7 @@ export const Navbar = () => {
               Profile
             </Link>
             <Link to="/share" className={getLinkClasses("/share")}>
-              Share
+              Share Profile
             </Link>
             <Link to="/Leaderboard" className={getLinkClasses("/Leaderboard")}>
               Leaderboard
@@ -81,7 +81,7 @@ export const Navbar = () => {
             {isLoggedin && (
               <button
                 onClick={handleLogout}
-                className="text-black hover:text-indigo-600 transition-colors flex">
+                className="text-black border px-3 rounded-lg hover:text-indigo-600 transition-colors flex">
                 Log Out
               </button>
             )}

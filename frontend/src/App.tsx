@@ -7,35 +7,35 @@ import { Profile } from "./pages/Profile";
 import "./index.css";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
-import ProtectedRoute from "./components/ProtectedRoutes";
+
 import AboutAndPrivacy from "./pages/About";
-import { useState } from "react";
-import { User } from "./lib/types";
+import { UserProvider } from "./contexts/Context";
+import ProtectedRoute from "./components/ProtectedRoutes";
 
 const App = () => {
-  const [user, setUser] = useState<User | null>(null);
-
   return (
     <BrowserRouter>
-      <div className=" outfit">
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/about" element={<AboutAndPrivacy />} />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute setUser={setUser}>
-                <Profile user={user} setUser={setUser} />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/*" element={<ErrorPage />} />
-        </Routes>
-        <Footer />
-      </div>
+      <UserProvider>
+        <div className=" outfit">
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/about" element={<AboutAndPrivacy />} />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/*" element={<ErrorPage />} />
+          </Routes>
+          <Footer />
+        </div>
+      </UserProvider>
     </BrowserRouter>
   );
 };

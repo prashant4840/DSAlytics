@@ -39,3 +39,20 @@ export const PLATFORMS: Platform[] = [
     logo: "/codeforces.webp",
   },
 ];
+
+export interface PlatformData {
+  avatar: string;
+  totalProblemsSolved: number;
+  rating?: number;
+  rank?: string;
+  maxRating?: number;
+  universityRank?: number;
+  contestGlobalRank?: number;
+}
+
+export interface UserStats {
+  gfg?: PlatformData;
+  leetcode?: PlatformData;
+  codeforces?: PlatformData;
+  interviewbit?: PlatformData;
+}
