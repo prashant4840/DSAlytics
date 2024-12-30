@@ -4,12 +4,14 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Mail } from "lucide-react";
 import axiosFetch from "../lib/axiosFetch";
+import Toast from "../components/ui/Toast";
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,6 +21,10 @@ const Signup = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    if (!email || !password || !name) {
+      setError("Enter valid details");
+    }
     try {
       const response = await axiosFetch.post(`/api/user/register`, {
         name,
@@ -28,19 +34,18 @@ const Signup = () => {
 
       if (response.status === 201) {
         localStorage.setItem("token", response.data.token);
-        console.log("Signup successful", response.data);
         navigate("/profile");
       } else {
-        console.log(response.data);
         throw new Error(response.data.message);
       }
     } catch (error) {
-      console.error("Error:", error);
+      setError("Error Signing up");
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+      {error && <Toast message={error} variant="error" />}
       <div className="w-full max-w-md">
         <motion.div
           initial={{ opacity: 0, y: -20 }}

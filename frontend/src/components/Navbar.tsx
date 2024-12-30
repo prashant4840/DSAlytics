@@ -1,12 +1,15 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
   const isLoggedin = localStorage.getItem("token");
+
+  const currentUrl = location.pathname;
+
+  const isVisible = currentUrl === "/login" || currentUrl === "/signup";
 
   const getLinkClasses = (path: string) => {
     return location.pathname === path
@@ -16,7 +19,7 @@ export const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate("/");
+    window.location.replace("/");
   };
 
   return (
@@ -49,13 +52,20 @@ export const Navbar = () => {
             <Link to="/Leaderboard" className={getLinkClasses("/Leaderboard")}>
               Leaderboard
             </Link>
-            {isLoggedin && (
-              <button
-                onClick={handleLogout}
-                className="text-black border px-3 rounded-lg hover:text-indigo-600 transition-colors flex">
-                Log Out
-              </button>
-            )}
+            {!isVisible &&
+              (isLoggedin ? (
+                <button
+                  onClick={handleLogout}
+                  className="text-black border border-black  px-3  rounded-lg hover:text-indigo-600 transition-colors flex">
+                  Log Out
+                </button>
+              ) : (
+                <Link to={"/login"}>
+                  <div className="text-black border border-black line px-3 rounded-lg hover:text-indigo-600 transition-colors flex">
+                    Log in
+                  </div>
+                </Link>
+              ))}
           </div>
           <button
             className="md:hidden text-black hover:text-indigo-600 transition-colors"
@@ -78,13 +88,20 @@ export const Navbar = () => {
             <Link to="/Leaderboard" className={getLinkClasses("/Leaderboard")}>
               Leaderboard
             </Link>
-            {isLoggedin && (
-              <button
-                onClick={handleLogout}
-                className="text-black border px-3 rounded-lg hover:text-indigo-600 transition-colors flex">
-                Log Out
-              </button>
-            )}
+            {!isVisible &&
+              (isLoggedin ? (
+                <button
+                  onClick={handleLogout}
+                  className="  rounded-lg hover:text-indigo-600 transition-colors flex">
+                  Log Out
+                </button>
+              ) : (
+                <Link to={"/login"}>
+                  <div className=" mt-2 underline rounded-lg hover:text-indigo-600 transition-colors flex">
+                    Log in
+                  </div>
+                </Link>
+              ))}
           </div>
         )}
       </div>

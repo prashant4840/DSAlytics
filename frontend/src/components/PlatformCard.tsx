@@ -84,7 +84,7 @@ export const PlatformCard = ({
             {isLoading ? (
               <div className="animate-pulse h-4 bg-gray-200 rounded w-24 mt-2" />
             ) : username ? (
-              <div className="flex items-center space-x-2">
+              <div className="sm:flex items-center space-x-2">
                 <span className="text-gray-600">{username}</span>
                 {platformStats?.rank && (
                   <Badge variant="secondary" className="text-xs">

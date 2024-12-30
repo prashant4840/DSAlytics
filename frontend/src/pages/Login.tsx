@@ -3,11 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Mail } from "lucide-react";
 import axiosFetch from "../lib/axiosFetch";
+import Toast from "../components/ui/Toast";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,6 +19,7 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     try {
       const response = await axiosFetch.post(`/api/user/login`, {
         email,
@@ -25,18 +28,18 @@ const Login = () => {
 
       if (response.status === 200) {
         localStorage.setItem("token", response.data.token);
-        console.log("Login successful");
         navigate("/profile");
       } else {
         throw new Error(response.data.message);
       }
-    } catch (error) {
-      console.error("Error:", error);
+    } catch (error: any) {
+      setError("Error logging in");
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+      {error && <Toast message={error} variant="error" />}
       <div className="w-full max-w-md">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -127,7 +130,7 @@ const Login = () => {
             <button
               type="submit"
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-              Sign in
+              Log in
             </button>
           </form>
 

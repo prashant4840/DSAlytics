@@ -5,18 +5,21 @@ import { PlatformCard } from "../components/PlatformCard";
 import { AxiosError } from "axios";
 import { useUserContext } from "../contexts/Context";
 import { ProfileHeader } from "../components/ui/ProfileHeader";
+import Toast from "../components/ui/Toast";
 
 // Main Profile Component
 export const Profile = () => {
   const [loadingPlatforms, setLoadingPlatforms] = useState<
     Record<string, boolean>
   >({});
+  const [error, setError] = useState<string | null>();
   const { user, setUser, setUserStats } = useUserContext();
 
   const handleUpdateUsername = async (platformId: string, username: string) => {
+    setError(null);
     const token = localStorage.getItem("token");
     if (!token) {
-      console.error("No token found");
+      setError("No token found");
       return;
     }
     try {
@@ -40,7 +43,7 @@ export const Profile = () => {
 
       return { success: true };
     } catch (error: AxiosError | any) {
-      console.error("Error updating username:", error.response?.data.message);
+      setError("Error updating username: " + error.response?.data.message);
       return { success: false };
     } finally {
       setLoadingPlatforms((prev) => ({ ...prev, [platformId]: false }));
@@ -48,14 +51,15 @@ export const Profile = () => {
   };
 
   const handleUpdatePfp = async (avatarUrl: string) => {
+    setError(null);
     const token = localStorage.getItem("token");
     if (!token) {
-      console.error("No token found");
+      setError("No token found");
       return;
     }
 
     if (!avatarUrl) {
-      console.error("No photo found");
+      setError("No photo found");
       return;
     }
 
@@ -79,16 +83,14 @@ export const Profile = () => {
       setUser(data);
       return { success: true };
     } catch (error: AxiosError | any) {
-      console.error(
-        "Error updating profile photo:",
-        error.response?.data.message
-      );
+      setError("Error updating profile photo:" + error.response?.data.message);
       return { success: false };
     }
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 mt-12">
+      {error && <Toast message={error} variant="error" />}
       <ProfileHeader
         onPhotoChange={handleUpdatePfp}
         loadingPlatforms={loadingPlatforms}

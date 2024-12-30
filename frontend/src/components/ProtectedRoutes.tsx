@@ -10,56 +10,49 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { setUser, setUserStats, isAuthenticated, setIsAuthenticated } =
-    useUserContext();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const { setUser, setUserStats } = useUserContext();
+
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
       const token = localStorage.getItem("token");
+
       if (!token) {
         setIsAuthenticated(false);
-        setIsLoading(false);
         return;
       }
 
       try {
-        const [authResponse, platformDataResponse] = await Promise.all([
-          axiosFetch.post<{ success: boolean; user: User }>(
-            "/api/user/verify",
-            {},
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          ),
-          axiosFetch.get("/api/platform/data", {
+        const authResponse = await axiosFetch.get<{
+          success: boolean;
+          user: User;
+        }>("/api/user/verify", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!authResponse.data.success) throw new Error("Not authorized");
+
+        const platformDataResponse = await axiosFetch.get(
+          "/api/platform/data",
+          {
             headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
+          }
+        );
 
-        setIsAuthenticated(authResponse.data.success);
         setUser(authResponse.data.user);
-
-        if (platformDataResponse.data) {
-          setUserStats(platformDataResponse.data);
-        }
+        if (platformDataResponse.data) setUserStats(platformDataResponse.data);
+        setIsAuthenticated(true);
       } catch (error) {
-        console.error("Error during authentication or fetching data:", error);
+        console.error("Error during authentication or fetching data:");
         setIsAuthenticated(false);
-      } finally {
-        setIsLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [setUser, setUserStats]);
 
-  if (isLoading) {
-    return (
-      <div>
-        <LoadingPage />
-      </div>
-    );
+  if (isAuthenticated === null) {
+    return <LoadingPage />;
   }
 
   return isAuthenticated ? children : <Navigate to="/login" />;

@@ -13,8 +13,6 @@ interface UserContextType {
   setUser: Dispatch<SetStateAction<User | null>>;
   userStats: UserStats | null;
   setUserStats: Dispatch<SetStateAction<UserStats | null>>;
-  isAuthenticated: boolean;
-  setIsAuthenticated: Dispatch<SetStateAction<boolean>>;
 }
 
 // Create contexts
@@ -28,7 +26,6 @@ interface UserProviderProps {
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [userStats, setUserStats] = useState<UserStats | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   return (
     <UserContext.Provider
@@ -37,8 +34,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         setUser,
         userStats,
         setUserStats,
-        isAuthenticated,
-        setIsAuthenticated,
       }}>
       {children}
     </UserContext.Provider>
