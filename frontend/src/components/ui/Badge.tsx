@@ -21,11 +21,11 @@ export const Badge = ({
     <>
       <span
         className={`
-        inline-flex items-center rounded-full px-3 sm:py-1  
+        inline-flex items-center rounded-full px-2 py-2 sm:py-1  
         ${variants[variant]}
         ${className}
         `}>
-        <p className="font-semibold sm:text-sm text-xs">Rank: </p>
+        <p className="font-semibold sm:text-sm text-xs">Rank&nbsp;:&nbsp; </p>
         <p className=" sm:text-sm text-xs">{children}</p>
       </span>
     </>

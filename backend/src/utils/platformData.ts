@@ -39,52 +39,81 @@ export const verifyPlatformData = async (updates: TVerificationRequest) => {
 
 export const LeetcodeData = async (username: string) => {
   try {
-    const data = JSON.stringify({
+    // First API call: Fetch user public profile and submit stats
+    const userProfileQuery = JSON.stringify({
       query: `
         query userPublicProfile($username: String!) {
-        matchedUser(username: $username) {
-          profile {
-            ranking
-            userAvatar
-          }
-          submitStats: submitStatsGlobal {
-            acSubmissionNum {
-              count
+          matchedUser(username: $username) {
+            profile {
+              ranking
+              userAvatar
+            }
+            submitStats: submitStatsGlobal {
+              acSubmissionNum {
+                count
+              }
             }
           }
         }
-        userContestRanking(username: $username) {
-          rating
-          globalRanking
-        }
-      }
       `,
-      variables: {
-        username: username,
-      },
+      variables: { username },
     });
 
-    const config = {
+    const userProfileConfig = {
       method: "post",
       maxBodyLength: Infinity,
       url: process.env.VITE_LEETCODE,
       headers: {
         "Content-Type": "application/json",
       },
-      data: data,
+      data: userProfileQuery,
     };
 
-    const response = await axios.request(config);
-    if (response.data.errors) {
+    const userProfileResponse = await axios.request(userProfileConfig);
+    if (userProfileResponse.data.errors) {
       throw new Error("User not found");
     }
-    const combinedResponse: PlatformData = {
-      avatar: response.data.data.matchedUser.profile.userAvatar,
-      totalProblemsSolved:
-        response.data.data.matchedUser.submitStats.acSubmissionNum[0].count,
-      rating: response.data.data.userContestRanking.rating,
-      contestGlobalRank: response.data.data.userContestRanking.globalRanking,
-      rank: response.data.data.matchedUser.profile.ranking,
+
+    const userProfileData = userProfileResponse.data.data.matchedUser;
+
+    // Second API call: Fetch user contest ranking
+    const userContestQuery = JSON.stringify({
+      query: `
+        query userContestRanking($username: String!) {
+          userContestRanking(username: $username) {
+            rating
+            globalRanking
+          }
+        }
+      `,
+      variables: { username },
+    });
+
+    const userContestConfig = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: process.env.VITE_LEETCODE,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: userContestQuery,
+    };
+
+    let userContestData = null;
+    try {
+      const userContestResponse = await axios.request(userContestConfig);
+      userContestData = userContestResponse.data.data.userContestRanking;
+    } catch (contestError) {
+      console.warn("Contest data not found or failed to fetch:", contestError);
+    }
+
+    // Combine responses
+    const combinedResponse = {
+      avatar: userProfileData.profile.userAvatar,
+      totalProblemsSolved: userProfileData.submitStats.acSubmissionNum[0].count,
+      rating: userContestData?.rating || null,
+      contestGlobalRank: userContestData?.globalRanking || null,
+      rank: userProfileData.profile.ranking,
     };
 
     return combinedResponse;
@@ -115,7 +144,7 @@ export const codeforcesData = async (username: string) => {
     const [response, response2] = await Promise.all([
       axios.get(`${process.env.VITE_CODEFORCES}${username}`),
       axios.get(
-        `${process.env.VITE_CODEFORCES_SUBMISSIONS}${username}&from=1&count=1000`
+        `${process.env.VITE_CODEFORCES_SUBMISSIONS}${username}&from=1&count=10000`
       ),
     ]);
 
@@ -123,26 +152,26 @@ export const codeforcesData = async (username: string) => {
       throw new Error("User not found");
     }
 
-    // Filter results with verdict 'OK' and count unique contestId
-    const solvedProblemsCount = [
-      ...new Set(
-        response2.data.result
-          .filter((submission: any) => submission.verdict === "OK")
-          .map((submission: any) => submission.contestId)
-      ),
-    ].length;
+    const submissions = response2.data.result;
+    const solvedProblems = new Set();
+
+    submissions.forEach((submission: any) => {
+      if (submission.verdict === "OK") {
+        const problemKey = `${submission.problem.contestId}-${submission.problem.index}`;
+        solvedProblems.add(problemKey);
+      }
+    });
 
     const combinedResponse: PlatformData = {
       avatar: response.data.result[0].avatar,
-      totalProblemsSolved: solvedProblemsCount,
+      totalProblemsSolved: solvedProblems.size,
     };
 
-    const res = response.data.result;
-
-    if (res.rating && res.rank && res.maxRating) {
-      combinedResponse.rating = res.rating;
-      combinedResponse.rank = res.rank;
-      combinedResponse.maxRating = res.maxRating;
+    const userInfo = response.data.result[0];
+    if (userInfo.rating && userInfo.rank && userInfo.maxRating) {
+      combinedResponse.rating = userInfo.rating;
+      combinedResponse.rank = userInfo.rank;
+      combinedResponse.maxRating = userInfo.maxRating;
     }
 
     return combinedResponse;

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Star, Target, Award, Brain } from "lucide-react";
+import { Star, Target, Award, Brain, University } from "lucide-react";
 import { Platform, UserStats } from "../lib/types";
 import { useUserContext } from "../contexts/Context";
 import Card, { CardContent } from "./ui/Card";
@@ -88,7 +88,9 @@ export const PlatformCard = ({
                 <span className="text-gray-600">{username}</span>
                 {platformStats?.rank && (
                   <Badge variant="secondary" className="text-xs">
-                    {platformStats.rank}
+                    {typeof platformStats.rank === "number"
+                      ? (platformStats.rank as number).toLocaleString()
+                      : platformStats.rank}
                   </Badge>
                 )}
               </div>
@@ -113,13 +115,13 @@ export const PlatformCard = ({
             <StatItem
               icon={Brain}
               label="Problems Solved"
-              value={platformStats.totalProblemsSolved}
+              value={platformStats.totalProblemsSolved.toLocaleString()}
             />
             {platformStats.rating && (
               <StatItem
                 icon={Star}
                 label="Rating"
-                value={platformStats.rating}
+                value={platformStats.rating.toFixed(2)}
                 className="text-blue-600"
               />
             )}
@@ -128,6 +130,14 @@ export const PlatformCard = ({
                 icon={Award}
                 label="Max Rating"
                 value={platformStats.maxRating}
+                className="text-green-600"
+              />
+            )}
+            {platformStats.universityRank && (
+              <StatItem
+                icon={University}
+                label="University Rank"
+                value={platformStats.universityRank}
                 className="text-green-600"
               />
             )}

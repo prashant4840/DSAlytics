@@ -8,11 +8,17 @@ export const Navbar = () => {
   const isLoggedin = localStorage.getItem("token");
 
   const currentUrl = location.pathname;
-
   const isVisible = currentUrl === "/login" || currentUrl === "/signup";
+  const textDark = currentUrl === "/share";
 
   const getLinkClasses = (path: string) => {
-    return location.pathname === path
+    if (textDark) {
+      return path === "/share"
+        ? "text-indigo-600 underline underline-offset-4 flex max-w-max "
+        : "hover:text-indigo-600 dark:text-white text-black transition-colors flex";
+    }
+
+    return currentUrl === path
       ? "text-indigo-600 border-b-2 border-indigo-600 flex max-w-max"
       : "text-black hover:text-indigo-600 transition-colors flex";
   };
@@ -23,7 +29,7 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 w-full backdrop-blur-[3px] rounded-b-3xl z-50">
+    <nav className="fixed top-0 w-full backdrop-blur-lg rounded-b-3xl z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center space-x-2">
@@ -40,7 +46,12 @@ export const Navbar = () => {
               <path d="M2 17l10 5 10-5" />
               <path d="M2 12l10 5 10-5" />
             </svg>
-            <span className="font-bold text-xl">DSA Stats</span>
+            <span
+              className={`font-bold ${
+                textDark ? "dark:text-white text-black" : "text-black"
+              } text-xl`}>
+              DSA Stats
+            </span>
           </Link>
           <div className="hidden md:flex space-x-8 text-lg">
             <Link to="/profile" className={getLinkClasses("/profile")}>
@@ -56,19 +67,21 @@ export const Navbar = () => {
               (isLoggedin ? (
                 <button
                   onClick={handleLogout}
-                  className="text-black border border-black  px-3  rounded-lg hover:text-indigo-600 transition-colors flex">
+                  className="text-gray-500 border border-gray-500 px-3 rounded-lg hover:text-indigo-600 transition-colors flex">
                   Log Out
                 </button>
               ) : (
                 <Link to={"/login"}>
-                  <div className="text-black border border-black line px-3 rounded-lg hover:text-indigo-600 transition-colors flex">
+                  <div className="text-gray-500 border border-gray-500 line px-3 rounded-lg hover:text-indigo-600 transition-colors flex">
                     Log in
                   </div>
                 </Link>
               ))}
           </div>
           <button
-            className="md:hidden text-black hover:text-indigo-600 transition-colors"
+            className={`md:hidden ${
+              textDark ? "dark:text-white text-black" : "text-black"
+            } hover:text-indigo-600 transition-colors`}
             onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? (
               <X className="h-6 w-6" />
@@ -92,12 +105,12 @@ export const Navbar = () => {
               (isLoggedin ? (
                 <button
                   onClick={handleLogout}
-                  className="  rounded-lg hover:text-indigo-600 transition-colors flex">
+                  className=" text-gray-500  rounded-lg transition-colors flex">
                   Log Out
                 </button>
               ) : (
                 <Link to={"/login"}>
-                  <div className=" mt-2 underline rounded-lg hover:text-indigo-600 transition-colors flex">
+                  <div className=" text-gray-500  mt-2 underline rounded-lg transition-colors flex">
                     Log in
                   </div>
                 </Link>
