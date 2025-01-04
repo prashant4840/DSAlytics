@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Code2, BarChart2 } from "lucide-react";
+import { BarChart2 } from "lucide-react";
 import { Hero } from "../components/Hero";
 import "./Home.css";
-import { IoShareSocial } from "react-icons/io5";
+import { GiProgression } from "react-icons/gi";
+import { MdLeaderboard } from "react-icons/md";
 
 interface FeatureCardProps {
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -182,19 +183,19 @@ const Home = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <FeatureCard
+              icon={MdLeaderboard}
+              title="Beautiful shareable cards"
+              description="Create beautiful cards to showcase your progress. Share them on social media or with potential employers."
+            />
+            <FeatureCard
               icon={BarChart2}
-              title="Unified Statistics"
-              description="View all your coding statistics from different platforms in one dashboard. Track your progress and identify areas for improvement."
+              title="Leaderboards"
+              description="Compete with friends and other users on the platform. See where you stand and get motivated to improve."
             />
             <FeatureCard
-              icon={Code2}
-              title="Rank Tracking"
-              description="Keep track of all your ranks across different platforms. Never have to worry about sharing multiple platforms for showcasing your ranks."
-            />
-            <FeatureCard
-              icon={IoShareSocial}
-              title="Progress Sharing"
-              description="Share your progress with friends or potential employers. Show off your consistent practice and improvement."
+              icon={GiProgression}
+              title="all your progress in one place"
+              description="Track your progress on multiple platforms in one place. No need to switch between multiple tabs. or share multiple links of different platforms."
             />
           </div>
         </div>

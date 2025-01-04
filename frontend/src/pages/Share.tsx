@@ -1,84 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import { Download, Share2, Link } from "lucide-react";
-import { UserStats } from "../lib/types";
-import Card from "../components/ui/Card";
 import { useUserContext } from "../contexts/Context";
 import { motion } from "framer-motion";
-import axiosFetch from "../lib/axiosFetch";
-
-const convertImageToDataURI = async (url: string): Promise<string> => {
-  if (url === "./defaultpfp.png") return url;
-  try {
-    const { data } = await axiosFetch.get(
-      `/api/fetchimg?url=${encodeURIComponent(url)}`
-    );
-    return data.data;
-  } catch (error) {
-    console.error("Error converting image to data URI:", error);
-    return "";
-  }
-};
-
-const getTotalProblemsSolved = (stats: UserStats) => {
-  return Object.values(stats).reduce((total, platform) => {
-    return total + (platform?.totalProblemsSolved || 0);
-  }, 0);
-};
-
-const backgrounds = {
-  default: {
-    component: () => (
-      <div className="h-full absolute w-full rounded-xl dark:bg-black bg-white dark:bg-grid-white/[0.2] bg-grid-black/[0.2]" />
-    ),
-    preview: "Dark/Light Grid",
-  },
-  dots: {
-    component: () => (
-      <div className="h-full absolute w-full rounded-xl bg-[#000000] bg-[radial-gradient(#ffffff33_1px,#00091d_1px)] bg-[size:20px_20px]" />
-    ),
-    preview: "Dot Grid",
-  },
-  gradient: {
-    component: () => (
-      <div className="h-full absolute w-full rounded-xl [background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]" />
-    ),
-    preview: "Purple Gradient",
-  },
-  dotMask: {
-    component: () => (
-      <div className="h-full absolute w-full rounded-xl bg-white">
-        <div className="h-full w-full bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
-      </div>
-    ),
-    preview: "Masked Dots",
-  },
-  grid: {
-    component: () => (
-      <div className="h-full w-full rounded-xl absolute bg-white bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:6rem_4rem]">
-        <div className="absolute bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle_500px_at_50%_200px,#C9EBFF,transparent)]" />
-      </div>
-    ),
-    preview: "Grid with Glow",
-  },
-};
-
-const BackgroundPreview = ({ bg, isSelected, onClick }: any) => (
-  <button
-    onClick={onClick}
-    className={`relative w-12 h-12 rounded-full overflow-hidden border-2 transition-all ${
-      isSelected
-        ? "border-blue-500 scale-110"
-        : "border-gray-200 hover:border-gray-300"
-    }`}>
-    <div className=" pb-28">
-      {React.createElement(
-        // @ts-ignore
-        backgrounds[bg].component
-      )}
-    </div>
-  </button>
-);
+import { ShareCard } from "../components/ShareCard";
 
 const SharePage = () => {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -86,35 +11,7 @@ const SharePage = () => {
   const [selectedBackground, setSelectedBackground] =
     useState<keyof typeof backgrounds>("default");
   const canCustomize = localStorage.getItem("token") !== null;
-  const { user, userStats } = useUserContext();
-  const [processedStats, setProcessedStats] = useState<UserStats | null>(null);
-  const [processedUserPfp, setProcessedUserPfp] = useState<string | null>(null);
-
-  useEffect(() => {
-    const processImages = async () => {
-      const updatedStats: { [key: string]: UserStats[keyof UserStats] } = {};
-
-      // Process user profile picture
-      if (user?.pfp) {
-        const pfpDataURI = await convertImageToDataURI(user.pfp);
-        setProcessedUserPfp(pfpDataURI);
-      }
-
-      // Process platform avatars
-      for (const [platform, stats] of Object.entries(userStats || {})) {
-        if (stats?.avatar) {
-          const avatarDataURI = await convertImageToDataURI(stats.avatar);
-          updatedStats[platform] = { ...stats, avatar: avatarDataURI };
-        } else {
-          updatedStats[platform] = stats;
-        }
-      }
-
-      setProcessedStats(updatedStats);
-    };
-
-    processImages();
-  }, [userStats, user?.pfp]);
+  const { user } = useUserContext();
 
   const handleDownload = async () => {
     if (!cardRef.current) return;
@@ -141,8 +38,8 @@ const SharePage = () => {
   const handleShare = async () => {
     try {
       await navigator.share({
-        title: `${user?.name}'s Coding Profile`,
-        text: "Check out my coding profile!",
+        title: `${user?.name}'s DSA Profile`,
+        text: "Check out my DSA profile!",
         url: window.location.href,
       });
     } catch (error) {
@@ -152,20 +49,6 @@ const SharePage = () => {
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
-  };
-
-  const containerAnimation = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, staggerChildren: 0.1 },
-    },
-  };
-
-  const itemAnimation = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0 },
   };
 
   const numUsernames = Object.values(user?.usernames || {}).filter(
@@ -190,141 +73,11 @@ const SharePage = () => {
   return (
     <div className="mx-auto dark:bg-zinc-950 bg-white space-y-6 py-20 px-4 md:px-20 items-center">
       <div className="max-w-xl mx-auto">
-        <motion.div
-          id="capture_div"
-          ref={cardRef}
-          className="overflow-hidden"
-          initial="hidden"
-          animate="visible"
-          variants={containerAnimation}>
-          <Card className="bg-white shadow-xl rounded-xl mx-2 sm:mx-10 md:mx-20">
-            <div className="md:h-[40rem] sm:h-[43rem] h-[38rem] rounded-xl relative flex items-center justify-center">
-              {/* Dynamic Background */}
-              {React.createElement(backgrounds[selectedBackground].component)}
-
-              <motion.div
-                className="p-3 space-y-4 relative z-10"
-                variants={itemAnimation}>
-                {/* Header Section */}
-                <div className="flex flex-col md:flex-row items-center md:space-x-6 md:p-4 p-1 border bg-white rounded-lg shadow-lg">
-                  <motion.img
-                    src={processedUserPfp || user?.pfp}
-                    alt={user?.name}
-                    className="w-20 h-20 md:w-28 md:h-28 rounded-full border-2 border-gray-200 shadow-md mb-4 md:mb-0"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.3 }}
-                  />
-                  <div className="flex-1 md:text-left">
-                    <h1 className="text-2xl md:text-3xl text-center font-bold text-gray-900">
-                      {user?.name}
-                    </h1>
-                    <div className=" text-center ">
-                      <div className="text-4xl md:text-5xl font-extrabold text-blue-600">
-                        {getTotalProblemsSolved(userStats!).toLocaleString()}
-                      </div>
-                      <div className="text-base md:text-lg text-gray-700 font-medium sm:mt-1">
-                        Total Problems Solved
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Platforms Grid */}
-                <motion.div
-                  className={`grid ${
-                    numUsernames < 3 ? "grid-cols-1" : "grid-cols-2 text-right"
-                  } sm:gap-4 gap-1`}
-                  variants={containerAnimation}>
-                  {processedStats &&
-                    Object.entries(processedStats).map(
-                      ([platform, stats]) =>
-                        stats && (
-                          <motion.div
-                            key={platform}
-                            className="bg-gray-50 border rounded-lg p-4 hover:shadow-md transition-all duration-200"
-                            variants={itemAnimation}>
-                            <div className="flex items-center justify-between sm:mb-3 sm:pb-2 border-b border-gray-200">
-                              <div className="flex items-center sm:space-x-3 space-x-1">
-                                <img
-                                  src={stats.avatar}
-                                  alt={platform}
-                                  className="w-6 h-6 rounded-full"
-                                />
-                                <h3 className="font-medium text-sm sm:text-lg text-gray-900 capitalize">
-                                  {platform}
-                                </h3>
-                              </div>
-                            </div>
-                            <div className="space-y-2 sm:text-sm  text-xs">
-                              <span className="font-bold text-blue-600 flex justify-center">
-                                {stats.totalProblemsSolved} solved
-                              </span>
-                              {"rating" in stats && (
-                                <div className="flex justify-between items-center">
-                                  <span className="text-gray-600">Rating </span>
-                                  <span className="font-semibold">
-                                    {stats.rating.toLocaleString()}
-                                  </span>
-                                </div>
-                              )}
-                              {"rank" in stats && (
-                                <div className="flex justify-between ">
-                                  <span className="text-gray-600">Rank </span>
-                                  <span className="font-semibold ">
-                                    {typeof stats.rank === "number"
-                                      ? stats.rank.toLocaleString()
-                                      : stats.rank.split(" ")[0]}
-                                  </span>
-                                </div>
-                              )}
-                              {"universityRank" in stats && (
-                                <div className="flex justify-between items-center">
-                                  <span className="text-gray-600">
-                                    University Rank :{" "}
-                                  </span>
-                                  <span className="font-semibold">
-                                    {stats.universityRank.toLocaleString()}
-                                  </span>
-                                </div>
-                              )}
-                              {"maxRating" in stats && (
-                                <div className="flex justify-between items-center">
-                                  <span className="text-gray-600">
-                                    Max rating{" "}
-                                  </span>
-                                  <span className="font-semibold">
-                                    {stats.maxRating.toLocaleString()}
-                                  </span>
-                                </div>
-                              )}
-                              {"contestGlobalRank" in stats && (
-                                <div className="flex justify-between items-center">
-                                  <span className="text-gray-600">
-                                    Contest{" "}
-                                  </span>
-                                  <span className="font-semibold">
-                                    {stats.contestGlobalRank.toLocaleString()}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          </motion.div>
-                        )
-                    )}
-                </motion.div>
-                <div>
-                  <a
-                    href="https://dsastats.com"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-gray-400 font-semibold sm:text-md text-sm">
-                    DSAStats.com
-                  </a>
-                </div>
-              </motion.div>
-            </div>
-          </Card>
-        </motion.div>
+        <ShareCard
+          cardRef={cardRef}
+          numUsernames={numUsernames}
+          selectedBackground={selectedBackground}
+        />
 
         {/* Actions Bar */}
         <motion.div
@@ -384,3 +137,56 @@ const SharePage = () => {
 };
 
 export default SharePage;
+
+export const backgrounds = {
+  default: {
+    component: () => (
+      <div className="h-full absolute w-full rounded-xl dark:bg-black bg-white dark:bg-grid-white/[0.2] bg-grid-black/[0.2]" />
+    ),
+    preview: "Dark/Light Grid",
+  },
+  dots: {
+    component: () => (
+      <div className="h-full absolute w-full rounded-xl bg-[#000000] bg-[radial-gradient(#ffffff33_1px,#00091d_1px)] bg-[size:20px_20px]" />
+    ),
+    preview: "Dot Grid",
+  },
+  gradient: {
+    component: () => (
+      <div className="h-full absolute w-full rounded-xl [background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]" />
+    ),
+    preview: "Purple Gradient",
+  },
+  dotMask: {
+    component: () => (
+      <div className="h-full absolute w-full rounded-xl bg-white">
+        <div className="h-full w-full bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
+      </div>
+    ),
+    preview: "Masked Dots",
+  },
+  grid: {
+    component: () => (
+      <div className="h-full w-full rounded-xl absolute bg-white bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:6rem_4rem]">
+        <div className="absolute bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle_500px_at_50%_200px,#C9EBFF,transparent)]" />
+      </div>
+    ),
+    preview: "Grid with Glow",
+  },
+};
+
+const BackgroundPreview = ({ bg, isSelected, onClick }: any) => (
+  <button
+    onClick={onClick}
+    className={`relative w-12 h-12 rounded-full overflow-hidden border-2 transition-all ${
+      isSelected
+        ? "border-blue-500 scale-110"
+        : "border-gray-200 hover:border-gray-300"
+    }`}>
+    <div className=" pb-28">
+      {React.createElement(
+        backgrounds[bg as keyof typeof backgrounds].component
+      )}
+    </div>
+  </button>
+);

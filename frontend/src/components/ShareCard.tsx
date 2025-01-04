@@ -1,0 +1,235 @@
+import { motion } from "framer-motion";
+import React, { useEffect, useState } from "react";
+import { UserStats } from "../lib/types";
+import Card from "../components/ui/Card";
+import { useUserContext } from "../contexts/Context";
+import axiosFetch from "../lib/axiosFetch";
+import { backgrounds } from "../pages/Share";
+
+const getTotalProblemsSolved = (stats: UserStats) => {
+  return Object.values(stats).reduce((total, platform) => {
+    return total + (platform?.totalProblemsSolved || 0);
+  }, 0);
+};
+
+const convertImageToDataURI = async (url: string): Promise<string> => {
+  if (url === "./defaultpfp.png") return url;
+  try {
+    const { data } = await axiosFetch.get(
+      `/api/fetchimg?url=${encodeURIComponent(url)}`
+    );
+    return data.data;
+  } catch (error) {
+    console.error("Error converting image to data URI:", error);
+    return "";
+  }
+};
+
+export const ShareCard = ({
+  cardRef,
+  numUsernames,
+  selectedBackground,
+}: {
+  cardRef: any;
+  numUsernames: number;
+  selectedBackground: keyof typeof backgrounds;
+}) => {
+  const [processedStats, setProcessedStats] = useState<UserStats | null>(null);
+  const [processedUserPfp, setProcessedUserPfp] = useState<string | null>(null);
+  const { user, userStats } = useUserContext();
+
+  useEffect(() => {
+    const processImages = async () => {
+      const updatedStats: { [key: string]: UserStats[keyof UserStats] } = {};
+
+      // Process user profile picture
+      if (user?.pfp) {
+        const pfpDataURI = await convertImageToDataURI(user.pfp);
+        setProcessedUserPfp(pfpDataURI);
+      }
+
+      // Process platform avatars
+      for (const [platform, stats] of Object.entries(userStats || {})) {
+        if (stats?.avatar) {
+          const avatarDataURI = await convertImageToDataURI(stats.avatar);
+          updatedStats[platform] = { ...stats, avatar: avatarDataURI };
+        } else {
+          updatedStats[platform] = stats;
+        }
+      }
+
+      setProcessedStats(updatedStats);
+    };
+
+    processImages();
+  }, [userStats, user?.pfp]);
+
+  const platformEnv = {
+    codeforces: import.meta.env.VITE_CODEFORCES + user?.usernames?.codeforces,
+    leetcode: import.meta.env.VITE_LEETCODE + user?.usernames?.leetcode,
+    gfg: import.meta.env.VITE_GFG + user?.usernames?.gfg,
+    interviewbit:
+      import.meta.env.VITE_INTERVIEWBIT + user?.usernames?.interviewbit,
+  };
+
+  const containerAnimation = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, staggerChildren: 0.1 },
+    },
+  };
+
+  const itemAnimation = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0 },
+  };
+
+  return (
+    <>
+      <motion.div
+        id="capture_div"
+        ref={cardRef}
+        className="overflow-hidden"
+        initial="hidden"
+        animate="visible"
+        variants={containerAnimation}>
+        <Card className="bg-white shadow-xl rounded-xl mx-2 sm:mx-10 md:mx-20">
+          <div className="md:h-[40rem] sm:h-[43rem] h-[38rem] rounded-xl relative flex items-center justify-center">
+            {React.createElement(backgrounds[selectedBackground]?.component)}
+            {React.createElement(backgrounds[selectedBackground].component)}
+
+            <motion.div
+              className="p-3 space-y-4 relative z-10"
+              variants={itemAnimation}>
+              {/* Header Section */}
+              <div className="flex flex-col md:flex-row items-center md:space-x-6 md:p-4 p-1 border bg-white rounded-lg shadow-lg">
+                <motion.img
+                  src={processedUserPfp || user?.pfp}
+                  alt={user?.name}
+                  className="w-20 h-20 md:w-28 md:h-28 rounded-full border-2 border-gray-200 shadow-md mb-4 md:mb-0"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.3 }}
+                />
+                <div className="flex-1 md:text-left">
+                  <h1 className="text-2xl md:text-3xl text-center font-bold text-gray-900">
+                    {user?.name}
+                  </h1>
+                  <div className=" text-center ">
+                    <div className="text-4xl md:text-5xl font-extrabold text-blue-600">
+                      {getTotalProblemsSolved(userStats!).toLocaleString()}
+                    </div>
+                    <div className="text-base md:text-lg text-gray-700 font-medium sm:mt-1">
+                      Total Problems Solved
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Platforms Grid */}
+              <motion.div
+                className={`grid ${
+                  numUsernames < 3 ? "grid-cols-1" : "grid-cols-2 text-right"
+                } sm:gap-4 gap-1`}
+                variants={containerAnimation}>
+                {processedStats &&
+                  Object.entries(processedStats).map(
+                    ([platform, stats]) =>
+                      stats && (
+                        <motion.div
+                          key={platform}
+                          className="bg-gray-50 border rounded-lg p-4 hover:shadow-md transition-all duration-200"
+                          variants={itemAnimation}>
+                          <a
+                            target="_blank"
+                            key={platform}
+                            href={
+                              platformEnv[platform as keyof typeof platformEnv]
+                            }>
+                            <div className="flex items-center justify-between sm:mb-3 sm:pb-2 border-b border-gray-200">
+                              <div className="flex items-center sm:space-x-3 space-x-1">
+                                <img
+                                  src={stats.avatar}
+                                  alt={platform}
+                                  className="w-6 h-6 rounded-full"
+                                />
+                                <h3 className="font-medium text-sm sm:text-lg text-gray-900 capitalize">
+                                  {platform}
+                                </h3>
+                              </div>
+                            </div>
+                            <div className="space-y-2 sm:text-sm  text-xs hover:scale-105 transition duration-300">
+                              <span className="font-bold text-blue-600 flex justify-center">
+                                {stats.totalProblemsSolved} solved
+                              </span>
+                              {"rating" in stats && (
+                                <div className="flex justify-between items-center">
+                                  <span className="text-gray-600">Rating </span>
+                                  <span className="font-semibold">
+                                    {stats.rating.toLocaleString()}
+                                  </span>
+                                </div>
+                              )}
+                              {"rank" in stats && (
+                                <div className="flex justify-between ">
+                                  <span className="text-gray-600">Rank </span>
+                                  <span className="font-semibold ">
+                                    {typeof stats.rank === "number"
+                                      ? stats.rank.toLocaleString()
+                                      : stats.rank.split(" ")[0]}
+                                  </span>
+                                </div>
+                              )}
+                              {"universityRank" in stats && (
+                                <div className="flex justify-between items-center">
+                                  <span className="text-gray-600">
+                                    University Rank :{" "}
+                                  </span>
+                                  <span className="font-semibold">
+                                    {stats.universityRank.toLocaleString()}
+                                  </span>
+                                </div>
+                              )}
+                              {"maxRating" in stats && (
+                                <div className="flex justify-between items-center">
+                                  <span className="text-gray-600">
+                                    Max rating{" "}
+                                  </span>
+                                  <span className="font-semibold">
+                                    {stats.maxRating.toLocaleString()}
+                                  </span>
+                                </div>
+                              )}
+                              {"contestGlobalRank" in stats && (
+                                <div className="flex justify-between items-center">
+                                  <span className="text-gray-600">
+                                    Contest{" "}
+                                  </span>
+                                  <span className="font-semibold">
+                                    {stats.contestGlobalRank.toLocaleString()}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </a>
+                        </motion.div>
+                      )
+                  )}
+              </motion.div>
+              <div>
+                <a
+                  href="https://dsastats.com"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-gray-400 font-semibold sm:text-md text-sm">
+                  DSAStats.com
+                </a>
+              </div>
+            </motion.div>
+          </div>
+        </Card>
+      </motion.div>
+    </>
+  );
+};
