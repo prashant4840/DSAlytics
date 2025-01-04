@@ -138,3 +138,34 @@ export const updateUserDetails = async (
     return res.status(500).json({ message: "Error updating user details" });
   }
 };
+
+export const deleteUser = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    // @ts-ignore
+    const { id } = req.user as { id: string }; // Extracted from auth middleware
+    const { platformId } = req.body;
+
+    if (!platformId) {
+      return res.status(400).json({ message: "Platform ID is required" });
+    }
+
+    // Find the user and update the specific platform's username to null
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { $unset: { [`usernames.${platformId}`]: "" } },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json(updatedUser);
+  } catch (error: any) {
+    console.error("Error deleting username:", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};

@@ -58,8 +58,8 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="pt-24 pb-16 sm:pt-40 sm:pb-24 bg-gradient-to-b from-zinc-300 to-white ">
+    <div className="min-h-screen ">
+      <div className="pt-24 pb-16 sm:pt-40 sm:pb-24 ">
         <div className="relative w-full max-w-4xl mx-auto">
           {/* LeetCode Logo */}
           <motion.img

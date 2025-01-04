@@ -42,8 +42,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
         setUser(authResponse.data.user);
         if (platformDataResponse.data) setUserStats(platformDataResponse.data);
         setIsAuthenticated(true);
-      } catch (error) {
-        console.error("Error during authentication or fetching data:");
+      } catch (error: any) {
+        if (error.response?.status === 429) {
+          console.error("Rate limit exceeded:", error.response.data.message);
+          window.location.href = "/";
+        } else {
+          console.error("Authentication or data fetching error:", error);
+        }
         setIsAuthenticated(false);
       }
     };

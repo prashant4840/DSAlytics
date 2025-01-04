@@ -1,23 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { useUserContext } from "../../contexts/Context";
 import { Trophy } from "lucide-react";
-import { ModalImg } from "./Modal";
+import { Modal, ModalImg } from "./Modal";
+import { MdEdit } from "react-icons/md";
 
 interface ProfileHeaderProps {
   onPhotoChange: (newPhoto: string) => void;
+  onUserUpdate: (data: {
+    name: string;
+    email: string;
+  }) => Promise<{ success: boolean }>;
   loadingPlatforms: Record<string, boolean>;
 }
 
 export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   onPhotoChange,
+  onUserUpdate,
   loadingPlatforms,
 }) => {
   const { user, userStats } = useUserContext();
   const [totalProblemsSolved, setTotalProblemsSolved] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<string>(
     user?.pfp || "./defaultpfp.png"
   );
+  const [editForm, setEditForm] = useState({
+    name: user?.name || "",
+    email: user?.email || "",
+  });
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isLoading: boolean = Object.values(loadingPlatforms).some(
     (loading) => loading
@@ -25,7 +38,11 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
   useEffect(() => {
     setSelectedPhoto(user?.pfp || "./defaultpfp.png");
-  }, []);
+    setEditForm({
+      name: user?.name || "",
+      email: user?.email || "",
+    });
+  }, [user]);
 
   useEffect(() => {
     const total = Object.values(userStats || {}).reduce((total, platform) => {
@@ -48,12 +65,34 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     setIsModalOpen(false);
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    if (user?.name === editForm.name && user?.email === editForm.email) {
+      setError("Changes are same as current profile");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const res = await onUserUpdate(editForm);
+      if (res.success) {
+        setIsEditModalOpen(false);
+      } else {
+        setError("Failed to update profile");
+      }
+    } catch (err) {
+      setError("An error occurred while updating profile");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-lg border p-6 mb-8">
+    <div className="bg-white rounded-lg shadow-lg border sm:p-5 p-2 mb-8">
       <div className="grid md:grid-cols-2 gap-6">
         {/* Left side - Profile Info */}
         <div className="space-y-4">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 border sm:p-5 p-4 rounded-xl relative">
             <button
               onClick={() => setIsModalOpen(true)}
               className="relative group">
@@ -75,6 +114,11 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 <span>{user?.email}</span>
               </div>
             </div>
+            <button
+              onClick={() => setIsEditModalOpen(true)}
+              className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors">
+              <MdEdit className="w-5 h-5 text-gray-600" />
+            </button>
           </div>
         </div>
 
@@ -102,10 +146,103 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </div>
       </div>
 
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setError("");
+          setEditForm({
+            name: user?.name || "",
+            email: user?.email || "",
+          });
+        }}>
+        <div className="p-6">
+          <h2 className="text-xl font-semibold mb-4">Edit Profile</h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <button
+              type="button"
+              onClick={() => {
+                setIsModalOpen(true);
+                setIsEditModalOpen(false);
+              }}
+              className="flex justify-center w-full text-center border hover:bg-gray-100 rounded-lg p-4 transition-colors">
+              <div>
+                <div className=" focus:outline-none focus:ring-2 focus:ring-blue-500 ">
+                  <img
+                    src={selectedPhoto}
+                    className="w-16 h-16 sm:w-24 sm:h-24 rounded-full hover:scale-105 transition duration-300"
+                    alt={`${user?.name}'s profile`}
+                  />{" "}
+                </div>
+                <div className=" flex justify-center space-x-2 items-center text-sm">
+                  <p>Change photo</p>
+                  <MdEdit />
+                </div>
+              </div>
+            </button>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Name
+              </label>
+              <input
+                type="text"
+                value={editForm.name}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, name: e.target.value })
+                }
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter your name"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                value={editForm.email}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, email: e.target.value })
+                }
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter your email"
+              />
+            </div>
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+            <div className="flex space-x-2">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50">
+                {isSubmitting ? "Saving..." : "Save Changes"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsEditModalOpen(false);
+                  setError("");
+                  setEditForm({
+                    name: user?.name || "",
+                    email: user?.email || "",
+                  });
+                }}
+                className="flex-1 border border-gray-300 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </Modal>
+
       {/* Photo Selection Modal */}
       <ModalImg
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          if (!isEditModalOpen) {
+            setIsEditModalOpen(true);
+          }
+        }}
         title="Select Profile Photo">
         <div className="grid grid-cols-2 gap-4">
           <div

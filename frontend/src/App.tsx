@@ -19,10 +19,26 @@ const App = () => {
       <div className=" outfit">
         <Navbar />
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route
+            path="/"
+            element={
+              <>
+                <div className="absolute z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.5),rgba(255,255,255,0))]"></div>
+                <Home />
+              </>
+            }
+          />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/about" element={<AboutAndPrivacy />} />
+          <Route
+            path="/about"
+            element={
+              <>
+                <div className="absolute z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.5),rgba(255,255,255,0))]"></div>
+                <AboutAndPrivacy />
+              </>
+            }
+          />
           <Route
             path="/share"
             element={
@@ -38,12 +54,23 @@ const App = () => {
             element={
               <UserProvider>
                 <ProtectedRoute>
-                  <Profile />
+                  <>
+                    <div className="absolute top-0 z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]"></div>
+                    <Profile />
+                  </>
                 </ProtectedRoute>
               </UserProvider>
             }
           />
-          <Route path="/*" element={<ErrorPage />} />
+          <Route
+            path="/*"
+            element={
+              <>
+                <div className="absolute top-0 z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.5),rgba(255,255,255,0))]"></div>
+                <ErrorPage />
+              </>
+            }
+          />
         </Routes>
         <Footer />
       </div>

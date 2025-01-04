@@ -188,7 +188,7 @@ const SharePage = () => {
     );
 
   return (
-    <div className="mx-auto dark:bg-zinc-950 bg-white space-y-6 py-10 md:py-20 px-4 md:px-20 items-center">
+    <div className="mx-auto dark:bg-zinc-950 bg-white space-y-6 py-20 px-4 md:px-20 items-center">
       <div className="max-w-xl mx-auto">
         <motion.div
           id="capture_div"
@@ -197,16 +197,16 @@ const SharePage = () => {
           initial="hidden"
           animate="visible"
           variants={containerAnimation}>
-          <Card className="bg-white shadow-xl rounded-xl mx-2 md:mx-10">
-            <div className="h-[40rem] w-full rounded-xl relative flex items-center justify-center">
+          <Card className="bg-white shadow-xl rounded-xl mx-2 sm:mx-10 md:mx-20">
+            <div className="md:h-[40rem] sm:h-[43rem] h-[38rem] rounded-xl relative flex items-center justify-center">
               {/* Dynamic Background */}
               {React.createElement(backgrounds[selectedBackground].component)}
 
               <motion.div
-                className="p-4 md:p-8 space-y-6 md:space-y-8 relative z-10"
+                className="p-3 space-y-4 relative z-10"
                 variants={itemAnimation}>
                 {/* Header Section */}
-                <div className="flex flex-col md:flex-row items-center md:space-x-6 p-4 border bg-white rounded-lg shadow-lg">
+                <div className="flex flex-col md:flex-row items-center md:space-x-6 md:p-4 p-1 border bg-white rounded-lg shadow-lg">
                   <motion.img
                     src={processedUserPfp || user?.pfp}
                     alt={user?.name}
@@ -214,15 +214,15 @@ const SharePage = () => {
                     whileHover={{ scale: 1.05 }}
                     transition={{ duration: 0.3 }}
                   />
-                  <div className="flex-1 text-center md:text-left">
-                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                  <div className="flex-1 md:text-left">
+                    <h1 className="text-2xl md:text-3xl text-center font-bold text-gray-900">
                       {user?.name}
                     </h1>
-                    <div className="mt-4">
+                    <div className=" text-center ">
                       <div className="text-4xl md:text-5xl font-extrabold text-blue-600">
                         {getTotalProblemsSolved(userStats!).toLocaleString()}
                       </div>
-                      <div className="text-base md:text-lg text-gray-700 font-medium mt-1">
+                      <div className="text-base md:text-lg text-gray-700 font-medium sm:mt-1">
                         Total Problems Solved
                       </div>
                     </div>
@@ -233,7 +233,7 @@ const SharePage = () => {
                 <motion.div
                   className={`grid ${
                     numUsernames < 3 ? "grid-cols-1" : "grid-cols-2 text-right"
-                  } gap-4`}
+                  } sm:gap-4 gap-1`}
                   variants={containerAnimation}>
                   {processedStats &&
                     Object.entries(processedStats).map(
@@ -243,35 +243,67 @@ const SharePage = () => {
                             key={platform}
                             className="bg-gray-50 border rounded-lg p-4 hover:shadow-md transition-all duration-200"
                             variants={itemAnimation}>
-                            <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-200">
-                              <div className="flex items-center space-x-3">
+                            <div className="flex items-center justify-between sm:mb-3 sm:pb-2 border-b border-gray-200">
+                              <div className="flex items-center sm:space-x-3 space-x-1">
                                 <img
                                   src={stats.avatar}
                                   alt={platform}
                                   className="w-6 h-6 rounded-full"
                                 />
-                                <h3 className="font-medium text-gray-900 capitalize">
+                                <h3 className="font-medium text-sm sm:text-lg text-gray-900 capitalize">
                                   {platform}
                                 </h3>
                               </div>
                             </div>
-                            <div className="space-y-2 text-sm">
-                              <span className="text-sm font-medium flex justify-center text-zinc-950">
+                            <div className="space-y-2 sm:text-sm  text-xs">
+                              <span className="font-bold text-blue-600 flex justify-center">
                                 {stats.totalProblemsSolved} solved
                               </span>
                               {"rating" in stats && (
                                 <div className="flex justify-between items-center">
-                                  <span className="text-gray-600">Rating</span>
+                                  <span className="text-gray-600">Rating </span>
                                   <span className="font-semibold">
-                                    {stats.rating?.toLocaleString()}
+                                    {stats.rating.toLocaleString()}
                                   </span>
                                 </div>
                               )}
                               {"rank" in stats && (
+                                <div className="flex justify-between ">
+                                  <span className="text-gray-600">Rank </span>
+                                  <span className="font-semibold ">
+                                    {typeof stats.rank === "number"
+                                      ? stats.rank.toLocaleString()
+                                      : stats.rank.split(" ")[0]}
+                                  </span>
+                                </div>
+                              )}
+                              {"universityRank" in stats && (
                                 <div className="flex justify-between items-center">
-                                  <span className="text-gray-600">Rank</span>
+                                  <span className="text-gray-600">
+                                    University Rank :{" "}
+                                  </span>
                                   <span className="font-semibold">
-                                    {stats.rank?.toLocaleString()}
+                                    {stats.universityRank.toLocaleString()}
+                                  </span>
+                                </div>
+                              )}
+                              {"maxRating" in stats && (
+                                <div className="flex justify-between items-center">
+                                  <span className="text-gray-600">
+                                    Max rating{" "}
+                                  </span>
+                                  <span className="font-semibold">
+                                    {stats.maxRating.toLocaleString()}
+                                  </span>
+                                </div>
+                              )}
+                              {"contestGlobalRank" in stats && (
+                                <div className="flex justify-between items-center">
+                                  <span className="text-gray-600">
+                                    Contest{" "}
+                                  </span>
+                                  <span className="font-semibold">
+                                    {stats.contestGlobalRank.toLocaleString()}
                                   </span>
                                 </div>
                               )}
@@ -285,7 +317,7 @@ const SharePage = () => {
                     href="https://dsastats.com"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-gray-400 font-semibold">
+                    className="text-gray-400 font-semibold sm:text-md text-sm">
                     DSAStats.com
                   </a>
                 </div>
@@ -296,13 +328,13 @@ const SharePage = () => {
 
         {/* Actions Bar */}
         <motion.div
-          className="flex justify-center space-x-4 mt-4 flex-wrap gap-y-2"
+          className="flex justify-center sm:space-x-4 space-x-2 mt-4 gap-y-2 "
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}>
           <button
             onClick={handleShare}
-            className="flex items-center border space-x-2 px-4 py-1 bg-zinc-900 text-white rounded-lg hover:bg-gray-800 transition-colors">
+            className="flex items-center border space-x-2 sm:px-4 px-2 py-1 bg-zinc-900 text-white rounded-lg hover:bg-gray-800 transition-colors">
             <Share2 className="w-4 h-4" />
             <span>Share</span>
           </button>
@@ -315,7 +347,7 @@ const SharePage = () => {
           </button>
           <button
             onClick={handleCopyLink}
-            className="flex items-center border space-x-2 px-4 py-1 bg-zinc-900 text-white rounded-lg hover:bg-gray-800 transition-colors">
+            className="flex items-center border space-x-2 sm:px-4 px-2 py-1 bg-zinc-900 text-white rounded-lg hover:bg-gray-800 transition-colors">
             <Link className="w-4 h-4" />
             <span>Copy Link</span>
           </button>
@@ -323,12 +355,12 @@ const SharePage = () => {
 
         {canCustomize && (
           <motion.div
-            className="mt-6 p-6 bg-white rounded-xl shadow-sm"
+            className="mt-6 p-6 bg-white rounded-xl shadow-sm text-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}>
             <h2 className="text-lg font-semibold mb-4">Customize Your Card</h2>
-            <div className="flex gap-4 flex-wrap">
+            <div className="flex gap-4 flex-wrap justify-center">
               {Object.keys(backgrounds).map((bg) => (
                 <div key={bg} className="flex flex-col items-center gap-2">
                   <BackgroundPreview

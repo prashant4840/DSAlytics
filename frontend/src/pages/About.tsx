@@ -2,7 +2,7 @@ import React from "react";
 
 const AboutAndPrivacy: React.FC = () => {
   return (
-    <div className="flex my-24 flex-col items-center p-6  text-gray-800">
+    <div className="flex py-24 flex-col items-center p-6  text-gray-800">
       <section className="max-w-3xl w-full mb-8">
         <h1 className="text-3xl font-bold mb-4">About</h1>
         <p className="text-lg leading-relaxed">

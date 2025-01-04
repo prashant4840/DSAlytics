@@ -30,6 +30,7 @@ export const PlatformCard = ({
   platform,
   username,
   onUpdate,
+  onDelete,
   isLoading,
 }: {
   platform: Platform;
@@ -38,9 +39,11 @@ export const PlatformCard = ({
     platformId: string,
     username: string
   ) => Promise<{ success: boolean } | undefined>;
+  onDelete: (platformId: string) => Promise<{ success: boolean }>;
   isLoading: boolean;
 }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [newUsername, setNewUsername] = useState(username || "");
   const [error, setError] = useState("");
   const { userStats } = useUserContext();
@@ -65,6 +68,17 @@ export const PlatformCard = ({
       setError("Error finding username");
     }
     setIsDisabled(false);
+  };
+
+  const handleDelete = async () => {
+    const res = await onDelete(platform.id);
+    if (res?.success) {
+      setIsEditing(false);
+      setError("");
+    } else {
+      setError("Error deleting platform");
+    }
+    setIsDeleting(false);
   };
 
   return (
@@ -152,49 +166,90 @@ export const PlatformCard = ({
           </div>
         )}
 
-        {/* Edit Modal */}
+        {/* Edit/Delete Modal */}
         <Modal
           isOpen={isEditing}
           onClose={() => {
             setNewUsername(username || "");
             setError("");
             setIsEditing(false);
+            setIsDeleting(false);
           }}>
           <div className="p-6">
-            <h2 className="text-xl font-semibold mb-4">
-              {username ? "Update" : "Add"} {platform.name} Username
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input
-                type="text"
-                value={newUsername}
-                onChange={(e) => {
-                  setIsDisabled(false);
-                  setNewUsername(e.target.value);
-                }}
-                placeholder="Enter username"
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
-              />
-              {error && <p className="text-red-500 text-sm">{error}</p>}
-              <div className="flex space-x-2">
-                <button
-                  type="submit"
-                  className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
-                  disabled={isLoading || isDisabled}>
-                  {isLoading ? "Saving..." : "Save"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setNewUsername(username || "");
-                    setError("");
-                    setIsEditing(false);
-                  }}
-                  className="flex-1 border border-gray-300 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors">
-                  Cancel
-                </button>
-              </div>
-            </form>
+            {!isDeleting ? (
+              <>
+                <h2 className="text-xl font-semibold mb-4">
+                  {username ? "Update" : "Add"} {platform.name} Username
+                </h2>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <input
+                    type="text"
+                    value={newUsername}
+                    onChange={(e) => {
+                      setIsDisabled(false);
+                      setNewUsername(e.target.value);
+                    }}
+                    placeholder="Enter username"
+                    className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+                  />
+                  {error && <p className="text-red-500 text-sm">{error}</p>}
+                  <div className="flex space-x-2">
+                    <button
+                      type="submit"
+                      className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
+                      disabled={isLoading || isDisabled}>
+                      {isLoading ? "Saving..." : "Save"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNewUsername(username || "");
+                        setError("");
+                        setIsEditing(false);
+                      }}
+                      className="flex-1 border border-gray-300 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors">
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+                {username && (
+                  <div className=" text-center mt-10">
+                    Delete this platform?
+                    <div className=" w-full mt-4 flex space-x-2 justify-center">
+                      <button
+                        type="button"
+                        onClick={() => setIsDeleting(true)}
+                        className="flex-1 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition-colors">
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <h2 className="text-xl font-semibold mb-4">
+                  Delete {platform.name} Platform
+                </h2>
+                <p className="text-gray-600 mb-4">
+                  Are you sure you want to delete this platform? This action
+                  cannot be undone.
+                </p>
+                {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+                <div className="flex space-x-2">
+                  <button
+                    onClick={handleDelete}
+                    className="flex-1 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition-colors">
+                    Confirm Delete
+                  </button>
+                  <button
+                    onClick={() => setIsDeleting(false)}
+                    className="flex-1 border border-gray-300 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors">
+                    Cancel
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </Modal>
       </CardContent>
