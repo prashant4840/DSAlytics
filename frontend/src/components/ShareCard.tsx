@@ -224,11 +224,11 @@ export const ShareCard = ({
               </motion.div>
               <div>
                 <a
-                  href="https://dsastats.com"
+                  href="https://dsastats.xyz"
                   target="_blank"
                   rel="noreferrer"
                   className="text-gray-400 font-semibold sm:text-md text-sm">
-                  DSAStats.com
+                  DSAStats.xyz
                 </a>
               </div>
             </motion.div>

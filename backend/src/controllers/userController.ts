@@ -91,6 +91,24 @@ export const verify = async (
   }
 };
 
+export const userId = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  // @ts-ignore
+  const { id } = req.user as { id: string };
+
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.json({ success: true, id });
+  } catch (error) {
+    return res.status(500).json({ message: "Error verifying user" });
+  }
+};
+
 export const setUserAvatar = async (
   req: Request,
   res: Response

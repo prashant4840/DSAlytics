@@ -15,7 +15,7 @@ const PreviewPage = () => {
     useState<keyof typeof backgrounds>("default");
   const [user, setUser] = useState<User | null>(null);
   const [userStats, setUserStats] = useState<UserStats | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const id = useParams().userid;
 

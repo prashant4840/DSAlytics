@@ -1,15 +1,46 @@
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axiosFetch from "../lib/axiosFetch";
 
 export const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const [userId, setUserId] = useState<string | null>();
   const location = useLocation();
-  const isLoggedin = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
   const currentUrl = location.pathname;
   const isVisible = currentUrl === "/login" || currentUrl === "/signup";
   const textDark = /^\/preview\/[^/]+$/.test(currentUrl);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!token) {
+        return;
+      }
+      try {
+        const { data } = await axiosFetch.get<{
+          success: boolean;
+          id: string;
+        }>("/api/user/id", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!data.success) throw new Error("Not authorized");
+        setUserId(data.id);
+      } catch (error: any) {
+        if (error.response?.status === 429) {
+          console.error("Rate limit exceeded:", error.response.data.message);
+          window.location.href = "/";
+        } else {
+          console.error("Authentication or data fetching error:", error);
+        }
+        setUserId(null);
+      }
+    };
+
+    fetchData();
+  }, [token]);
 
   const getLinkClasses = (path: string) => {
     if (textDark) {
@@ -57,15 +88,16 @@ export const Navbar = () => {
             <Link to="/profile" className={getLinkClasses("/profile")}>
               Profile
             </Link>
-            {/* todo fix this navigation to be dynamic */}
-            <Link to="/preview" className={getLinkClasses("/preview")}>
+            <Link
+              to={`/preview/${userId}`}
+              className={getLinkClasses("/preview")}>
               Preview
             </Link>
             <Link to="/Leaderboard" className={getLinkClasses("/Leaderboard")}>
               Leaderboard
             </Link>
             {!isVisible &&
-              (isLoggedin ? (
+              (token ? (
                 <button
                   onClick={handleLogout}
                   className="text-gray-500 border border-gray-500 px-3 rounded-lg hover:text-indigo-600 transition-colors flex">
@@ -96,14 +128,16 @@ export const Navbar = () => {
             <Link to="/profile" className={getLinkClasses("/profile")}>
               Profile
             </Link>
-            <Link to="/preview" className={getLinkClasses("/preview")}>
+            <Link
+              to={`/preview/${userId}`}
+              className={getLinkClasses("/preview")}>
               Preview
             </Link>
             <Link to="/Leaderboard" className={getLinkClasses("/Leaderboard")}>
               Leaderboard
             </Link>
             {!isVisible &&
-              (isLoggedin ? (
+              (token ? (
                 <button
                   onClick={handleLogout}
                   className=" text-gray-500  rounded-lg transition-colors flex">
