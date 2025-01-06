@@ -9,11 +9,11 @@ export const Navbar = () => {
 
   const currentUrl = location.pathname;
   const isVisible = currentUrl === "/login" || currentUrl === "/signup";
-  const textDark = currentUrl === "/share";
+  const textDark = /^\/preview\/[^/]+$/.test(currentUrl);
 
   const getLinkClasses = (path: string) => {
     if (textDark) {
-      return path === "/share"
+      return path.startsWith("/preview")
         ? "text-indigo-600 underline underline-offset-4 flex max-w-max "
         : "hover:text-indigo-600 dark:text-white text-black transition-colors flex";
     }
@@ -57,8 +57,9 @@ export const Navbar = () => {
             <Link to="/profile" className={getLinkClasses("/profile")}>
               Profile
             </Link>
-            <Link to="/share" className={getLinkClasses("/share")}>
-              Share Profile
+            {/* todo fix this navigation to be dynamic */}
+            <Link to="/preview" className={getLinkClasses("/preview")}>
+              Preview
             </Link>
             <Link to="/Leaderboard" className={getLinkClasses("/Leaderboard")}>
               Leaderboard
@@ -95,8 +96,8 @@ export const Navbar = () => {
             <Link to="/profile" className={getLinkClasses("/profile")}>
               Profile
             </Link>
-            <Link to="/share" className={getLinkClasses("/share")}>
-              Share Profile
+            <Link to="/preview" className={getLinkClasses("/preview")}>
+              Preview
             </Link>
             <Link to="/Leaderboard" className={getLinkClasses("/Leaderboard")}>
               Leaderboard

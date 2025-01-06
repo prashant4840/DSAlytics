@@ -11,7 +11,7 @@ import { Footer } from "./components/Footer";
 import AboutAndPrivacy from "./pages/About";
 import { UserProvider } from "./contexts/Context";
 import ProtectedRoute from "./components/ProtectedRoutes";
-import SharePage from "./pages/Share";
+import PreviewPage from "./pages/Preview";
 
 const App = () => {
   return (
@@ -39,16 +39,7 @@ const App = () => {
               </>
             }
           />
-          <Route
-            path="/share"
-            element={
-              <UserProvider>
-                <ProtectedRoute>
-                  <SharePage />
-                </ProtectedRoute>
-              </UserProvider>
-            }
-          />
+          <Route path="/preview/:userid" element={<PreviewPage />} />
           <Route
             path="/profile"
             element={

@@ -1,10 +1,9 @@
 import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
-import { UserStats } from "../lib/types";
+import { User, UserStats } from "../lib/types";
 import Card from "../components/ui/Card";
-import { useUserContext } from "../contexts/Context";
 import axiosFetch from "../lib/axiosFetch";
-import { backgrounds } from "../pages/Share";
+import { backgrounds } from "../pages/Preview";
 
 const getTotalProblemsSolved = (stats: UserStats) => {
   return Object.values(stats).reduce((total, platform) => {
@@ -29,14 +28,17 @@ export const ShareCard = ({
   cardRef,
   numUsernames,
   selectedBackground,
+  user,
+  userStats,
 }: {
   cardRef: any;
   numUsernames: number;
   selectedBackground: keyof typeof backgrounds;
+  user: User | null;
+  userStats: UserStats | null;
 }) => {
   const [processedStats, setProcessedStats] = useState<UserStats | null>(null);
   const [processedUserPfp, setProcessedUserPfp] = useState<string | null>(null);
-  const { user, userStats } = useUserContext();
 
   useEffect(() => {
     const processImages = async () => {
@@ -113,7 +115,10 @@ export const ShareCard = ({
                   transition={{ duration: 0.3 }}
                 />
                 <div className="flex-1 md:text-left">
-                  <h1 className="text-2xl md:text-3xl text-center font-bold text-gray-900">
+                  <h1
+                    className={`text-2xl md:text-3xl text-center font-bold text-gray-900 ${
+                      user?.name.length! > 10 ? "text-sm md:text-lg" : ""
+                    }`}>
                     {user?.name}
                   </h1>
                   <div className=" text-center ">

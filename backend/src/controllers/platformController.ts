@@ -36,6 +36,72 @@ const getCachedData = async (
   return data;
 };
 
+// Reusable helper for platform data fetching
+const fetchPlatformData = async (
+  usernames: Record<string, string | undefined>
+) => {
+  const platforms = {
+    gfg: gfgData,
+    leetcode: LeetcodeData,
+    codeforces: codeforcesData,
+    interviewbit: interviewbitData,
+  };
+
+  const results: Record<string, any> = {};
+
+  for (const [platform, fetchFunction] of Object.entries(platforms)) {
+    const username = usernames[platform];
+    if (username) {
+      const data = await getCachedData(`${platform}:${username}`, () =>
+        fetchFunction(username)
+      );
+      if (data) {
+        results[platform] = data;
+      }
+    }
+  }
+
+  return results;
+};
+
+export const previewPlatformData = async (req: Request, res: Response) => {
+  try {
+    const { userid } = req.params;
+
+    const user = await User.findById(userid).select("name email usernames pfp");
+    if (!user) {
+      return res.status(404).json({ success: false, error: "User not found" });
+    }
+
+    const { usernames } = user;
+    if (!usernames) {
+      return res.status(403).json({
+        success: false,
+        user,
+        error: "Usernames not found",
+      });
+    }
+
+    const filteredUsernames: Record<string, string | undefined> =
+      Object.fromEntries(
+        Object.entries(usernames).filter(([_, v]) => v !== null)
+      ) as Record<string, string | undefined>;
+
+    const results = await fetchPlatformData(filteredUsernames);
+
+    return res.json({
+      success: true,
+      user,
+      userStats: results,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      error: `Failed to fetch data: ${error.message}`,
+    });
+  }
+};
+
 export const platformData = async (req: Request, res: Response) => {
   try {
     // @ts-ignore
@@ -51,54 +117,12 @@ export const platformData = async (req: Request, res: Response) => {
       return res.status(403).json({ error: "Usernames not found" });
     }
 
-    const results: Record<string, any> = {};
+    const filteredUsernames: Record<string, string | undefined> =
+      Object.fromEntries(
+        Object.entries(usernames).filter(([_, v]) => v !== null)
+      ) as Record<string, string | undefined>;
 
-    if (usernames.gfg) {
-      const gfgRes = await getCachedData(`gfg:${usernames.gfg}`, () =>
-        gfgData(usernames.gfg!)
-      );
-      if (gfgRes) {
-        results.gfg = gfgRes;
-      } else {
-        return res.status(404).json({ error: "GFG data not found" });
-      }
-    }
-
-    if (usernames.leetcode) {
-      const leetcodeRes = await getCachedData(
-        `leetcode:${usernames.leetcode}`,
-        () => LeetcodeData(usernames.leetcode!)
-      );
-      if (leetcodeRes) {
-        results.leetcode = leetcodeRes;
-      } else {
-        return res.status(404).json({ error: "Leetcode data not found" });
-      }
-    }
-
-    if (usernames.codeforces) {
-      const codeforcesRes = await getCachedData(
-        `codeforces:${usernames.codeforces}`,
-        () => codeforcesData(usernames.codeforces!)
-      );
-      if (codeforcesRes) {
-        results.codeforces = codeforcesRes;
-      } else {
-        return res.status(404).json({ error: "Codeforces data not found" });
-      }
-    }
-
-    if (usernames.interviewbit) {
-      const interviewbitRes = await getCachedData(
-        `interviewbit:${usernames.interviewbit}`,
-        () => interviewbitData(usernames.interviewbit!)
-      );
-      if (interviewbitRes) {
-        results.interviewbit = interviewbitRes;
-      } else {
-        return res.status(404).json({ error: "InterviewBit data not found" });
-      }
-    }
+    const results = await fetchPlatformData(filteredUsernames);
 
     return res.json(results);
   } catch (error: any) {
@@ -115,14 +139,12 @@ export const fetchImage = async (req: Request, res: Response) => {
   }
 
   try {
-    // Fetch the image from the URL
     const response = await axios.get(url as string, {
       responseType: "arraybuffer",
     });
     const base64 = Buffer.from(response.data, "binary").toString("base64");
     const mimeType = response.headers["content-type"];
 
-    // Send the base64 encoded image with its MIME type
     res.json({
       data: `data:${mimeType};base64,${base64}`,
     });

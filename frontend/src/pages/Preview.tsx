@@ -1,17 +1,56 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import { Download, Share2, Link } from "lucide-react";
-import { useUserContext } from "../contexts/Context";
 import { motion } from "framer-motion";
 import { ShareCard } from "../components/ShareCard";
+import { User, UserStats } from "../lib/types";
+import { useParams } from "react-router-dom";
+import axiosFetch from "../lib/axiosFetch";
+import LoadingPage from "./Loading";
 
-const SharePage = () => {
+const PreviewPage = () => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedBackground, setSelectedBackground] =
     useState<keyof typeof backgrounds>("default");
+  const [user, setUser] = useState<User | null>(null);
+  const [userStats, setUserStats] = useState<UserStats | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const id = useParams().userid;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const { data } = await axiosFetch.get<{
+          success: boolean;
+          user?: User;
+          userStats?: UserStats;
+        }>(`/preview/${id}`);
+
+        if (data.success) {
+          if (data.user) setUser(data.user);
+          if (data.userStats) setUserStats(data.userStats);
+        } else {
+          throw new Error("User not found");
+        }
+      } catch (error: any) {
+        if (error.response?.status === 429) {
+          console.error("Rate limit exceeded:", error.response.data.message);
+          window.location.href = "/";
+        } else {
+          console.error("Authentication or data fetching error:", error);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [setUser, setUserStats]);
+
   const canCustomize = localStorage.getItem("token") !== null;
-  const { user } = useUserContext();
 
   const handleDownload = async () => {
     if (!cardRef.current) return;
@@ -55,9 +94,13 @@ const SharePage = () => {
     (username) => username
   ).length;
 
+  if (isLoading) {
+    return <LoadingPage />;
+  }
+
   if (numUsernames === 0)
     return (
-      <div className="mx-auto dark:bg-zinc-950 py-60 bg-white dark:text-white text-black text-7xl text-center space-y-6 px-20 items-center">
+      <div className="mx-auto dark:bg-zinc-950 py-64 bg-white dark:text-white text-black text-6xl text-center space-y-6 px-20 items-center">
         Please add your Codeforces | LeetCode | GeeksforGeeks | InterviewBit
         usernames to generate your profile card.
         <div className="flex justify-center mt-10">
@@ -77,6 +120,8 @@ const SharePage = () => {
           cardRef={cardRef}
           numUsernames={numUsernames}
           selectedBackground={selectedBackground}
+          user={user}
+          userStats={userStats}
         />
 
         {/* Actions Bar */}
@@ -136,7 +181,7 @@ const SharePage = () => {
   );
 };
 
-export default SharePage;
+export default PreviewPage;
 
 export const backgrounds = {
   default: {

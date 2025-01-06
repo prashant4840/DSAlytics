@@ -172,9 +172,9 @@ export const Profile = () => {
           ))}
         </div>
         <div className=" flex justify-center mt-10">
-          <Link to="/share" className=" texl-4xl">
+          <Link to="/preview" className=" texl-4xl">
             <button className="px-4 py-2  rounded-md border border-black bg-white text-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0)] transition duration-200">
-              Create Profile card to share
+              Preview Profile card
             </button>
           </Link>
         </div>
