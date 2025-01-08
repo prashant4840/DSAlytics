@@ -32,7 +32,7 @@ export const Hero = () => {
           All your DSA stats in <AnimatedHighlight>one place</AnimatedHighlight>
         </motion.h1>
 
-        <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl mx-auto animate-slide-down-slow">
+        <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl mx-auto animate-slide-down">
           Share your progress across LeetCode, GeeksForGeeks, Codeforces and
           more. showcase your coding journey in a single place. Get started now!
         </p>

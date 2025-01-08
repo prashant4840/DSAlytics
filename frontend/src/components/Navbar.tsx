@@ -5,7 +5,8 @@ import axiosFetch from "../lib/axiosFetch";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [userId, setUserId] = useState<string | null>();
+  const [userId, setUserId] = useState<string | null>(null);
+  const [rateLimitExceeded, setRateLimitExceeded] = useState<boolean>(false);
   const location = useLocation();
   const token = localStorage.getItem("token");
 
@@ -15,9 +16,8 @@ export const Navbar = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!token) {
-        return;
-      }
+      if (!token || rateLimitExceeded) return; // Avoid infinite requests
+
       try {
         const { data } = await axiosFetch.get<{
           success: boolean;
@@ -31,7 +31,7 @@ export const Navbar = () => {
       } catch (error: any) {
         if (error.response?.status === 429) {
           console.error("Rate limit exceeded:", error.response.data.message);
-          window.location.href = "/";
+          setRateLimitExceeded(true);
         } else {
           console.error("Authentication or data fetching error:", error);
         }
@@ -40,7 +40,7 @@ export const Navbar = () => {
     };
 
     fetchData();
-  }, [token]);
+  }, [token, rateLimitExceeded]);
 
   const getLinkClasses = (path: string) => {
     if (textDark) {

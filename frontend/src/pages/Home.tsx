@@ -39,27 +39,11 @@ const Home = () => {
     };
   }, []);
 
-  const floatingVariant = {
-    initial: { y: 0, opacity: 0 },
-    animate: {
-      x: [0, -10, 0],
-      opacity: 1,
-      transition: {
-        x: {
-          duration: 3,
-          ease: "easeInOut",
-          repeat: Infinity,
-        },
-        opacity: {
-          duration: 0.8,
-          ease: "easeInOut",
-        },
-      },
-    },
-  };
-
   return (
     <div className="min-h-screen ">
+      <div className="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)]">
+        <div className="absolute pointer-events-none inset-0 flex items-center justify-center  bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_2%,black)]"></div>
+      </div>
       <div className="pt-24 pb-16 sm:pt-40 sm:pb-24 ">
         <div className="relative w-full max-w-4xl mx-auto">
           {/* LeetCode Logo */}
@@ -71,19 +55,17 @@ const Home = () => {
               x: mousePosition.x * 0.04,
               y: mousePosition.y * 0.04,
             }}
-            variants={floatingVariant}
             initial="initial"
             animate="animate"
           />
           <motion.img
             src="/logos/leetcode.webp"
             alt="leetcode"
-            className="hidden blur-[2.2px] lg:block w-7 h-7 absolute bottom-20 -right-20 drop-shadow-[0_16px_24px_rgba(139,87,42,0.35)]"
+            className="hidden blur-[2.2px] lg:block w-7 h-7 absolute top-32 right-2 drop-shadow-[0_16px_24px_rgba(139,87,42,0.35)]"
             style={{
-              x: mousePosition.x * 0.03,
-              y: mousePosition.y * 0.03,
+              x: mousePosition.x * 0.02,
+              y: mousePosition.y * 0.02,
             }}
-            variants={floatingVariant}
             initial="initial"
             animate="animate"
           />
@@ -97,7 +79,6 @@ const Home = () => {
               x: mousePosition.x * 0.02,
               y: mousePosition.y * 0.02,
             }}
-            variants={floatingVariant}
             initial="initial"
             animate="animate"
           />
@@ -110,21 +91,19 @@ const Home = () => {
               x: mousePosition.x * 0.02,
               y: mousePosition.y * 0.02,
             }}
-            variants={floatingVariant}
             initial="initial"
             animate="animate"
           />
 
           {/* CodeChef Logo */}
           <motion.img
-            src="/logos/codechef.png"
+            src="/logos/codeforces.webp"
             alt="CodeChef"
-            className="hidden blur-[1.5px] lg:block w-20 h-20 absolute bottom-0 -left-10 drop-shadow-[0_16px_24px_rgba(139,87,42,0.35)]"
+            className="hidden blur-[1.5px] lg:block w-10 h-10 absolute bottom-10 -left-10 drop-shadow-[0_16px_24px_rgba(139,87,42,0.35)]"
             style={{
               x: mousePosition.x * 0.03,
               y: mousePosition.y * 0.03,
             }}
-            variants={floatingVariant}
             initial="initial"
             animate="animate"
           />
@@ -138,7 +117,6 @@ const Home = () => {
               x: mousePosition.x * 0.05,
               y: mousePosition.y * 0.05,
             }}
-            variants={floatingVariant}
             initial="initial"
             animate="animate"
           />
@@ -151,7 +129,6 @@ const Home = () => {
               x: mousePosition.x * 0.05,
               y: mousePosition.y * 0.05,
             }}
-            variants={floatingVariant}
             initial="initial"
             animate="animate"
           />
@@ -160,12 +137,11 @@ const Home = () => {
           <motion.img
             src="/logos/codeforces.webp"
             alt="Codeforces"
-            className="hidden blur-[1.5px] lg:block w-14 h-14 absolute top-40 right-0 drop-shadow-[0_16px_24px_rgba(255,141,0,0.35)]"
+            className="hidden blur-[1.5px] lg:block w-14 h-14 absolute top-40 -right-40 drop-shadow-[0_16px_24px_rgba(255,141,0,0.35)]"
             style={{
-              x: mousePosition.x * 0.03,
+              x: mousePosition.x * 0.04,
               y: mousePosition.y * 0.03,
             }}
-            variants={floatingVariant}
             initial="initial"
             animate="animate"
           />

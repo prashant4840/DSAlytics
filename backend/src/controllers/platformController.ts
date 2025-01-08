@@ -132,24 +132,35 @@ export const platformData = async (req: Request, res: Response) => {
   }
 };
 
-export const fetchImage = async (req: Request, res: Response) => {
-  const { url } = req.query;
-  if (!url) {
-    return res.status(400).json({ error: "Image URL is required" });
-  }
+export const fetchImages = async (req: Request, res: Response) => {
+  const { urls } = req.body;
 
   try {
-    const response = await axios.get(url as string, {
-      responseType: "arraybuffer",
-    });
-    const base64 = Buffer.from(response.data, "binary").toString("base64");
-    const mimeType = response.headers["content-type"];
+    const fetchImage = async (url: string) => {
+      const response = await axios.get(url, { responseType: "arraybuffer" });
+      const base64 = Buffer.from(response.data, "binary").toString("base64");
+      const mimeType = response.headers["content-type"];
+      return `data:${mimeType};base64,${base64}`;
+    };
+
+    const results = await Promise.all(
+      Object.entries(urls).map(async ([key, url]) => {
+        if (typeof url === "string") {
+          const data = await fetchImage(url);
+          return [key, data];
+        }
+        return [key, null];
+      })
+    );
+
+    const responseData = Object.fromEntries(results);
 
     res.json({
-      data: `data:${mimeType};base64,${base64}`,
+      success: true,
+      imgs: responseData,
     });
   } catch (error) {
-    console.error("Error fetching image");
-    res.status(500).json({ error: "Failed to fetch image" });
+    console.error("Error fetching images", error);
+    res.status(500).json({ error: "Failed to fetch images" });
   }
 };

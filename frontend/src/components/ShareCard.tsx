@@ -11,19 +11,6 @@ const getTotalProblemsSolved = (stats: UserStats) => {
   }, 0);
 };
 
-const convertImageToDataURI = async (url: string): Promise<string> => {
-  if (url === "./defaultpfp.png") return url;
-  try {
-    const { data } = await axiosFetch.get(
-      `/api/fetchimg?url=${encodeURIComponent(url)}`
-    );
-    return data.data;
-  } catch (error) {
-    console.error("Error converting image to data URI:", error);
-    return "";
-  }
-};
-
 export const ShareCard = ({
   cardRef,
   numUsernames,
@@ -39,28 +26,47 @@ export const ShareCard = ({
 }) => {
   const [processedStats, setProcessedStats] = useState<UserStats | null>(null);
   const [processedUserPfp, setProcessedUserPfp] = useState<string | null>(null);
-
   useEffect(() => {
     const processImages = async () => {
       const updatedStats: { [key: string]: UserStats[keyof UserStats] } = {};
 
-      // Process user profile picture
+      // Collect all avatar URLs
+      const avatarUrls: { [key: string]: string } = {};
       if (user?.pfp) {
-        const pfpDataURI = await convertImageToDataURI(user.pfp);
-        setProcessedUserPfp(pfpDataURI);
+        avatarUrls["userPfp"] = user.pfp;
       }
 
-      // Process platform avatars
       for (const [platform, stats] of Object.entries(userStats || {})) {
         if (stats?.avatar) {
-          const avatarDataURI = await convertImageToDataURI(stats.avatar);
-          updatedStats[platform] = { ...stats, avatar: avatarDataURI };
-        } else {
-          updatedStats[platform] = stats;
+          avatarUrls[platform] = stats.avatar;
         }
       }
 
-      setProcessedStats(updatedStats);
+      try {
+        // Send all avatar URLs to the backend
+        const { data } = await axiosFetch.post("/api/platformimg", {
+          urls: avatarUrls,
+        });
+
+        if (data.success) {
+          setProcessedUserPfp(data.imgs.userPfp);
+          const { imgs } = data;
+
+          // Process platform avatars
+          for (const [platform, stats] of Object.entries(userStats || {})) {
+            if (stats?.avatar && imgs[platform]) {
+              updatedStats[platform] = { ...stats, avatar: imgs[platform] };
+            } else {
+              updatedStats[platform] = stats;
+            }
+          }
+          setProcessedStats(updatedStats);
+        } else {
+          throw new Error("Could not find image data");
+        }
+      } catch (error) {
+        console.error("Error processing images : ", error);
+      }
     };
 
     processImages();
@@ -117,7 +123,7 @@ export const ShareCard = ({
                 <div className="flex-1 md:text-left">
                   <h1
                     className={`text-2xl md:text-3xl text-center font-bold text-gray-900 ${
-                      user?.name.length! > 10 ? "text-sm md:text-lg" : ""
+                      user!.name.length! > 10 ? "text-sm md:text-lg" : ""
                     }`}>
                     {user?.name}
                   </h1>

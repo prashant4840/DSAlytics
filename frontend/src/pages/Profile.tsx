@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PLATFORMS } from "../lib/types";
 import axiosFetch from "../lib/axiosFetch";
 import { PlatformCard } from "../components/PlatformCard";
@@ -15,6 +15,37 @@ export const Profile = () => {
   >({});
   const [error, setError] = useState<string | null>();
   const { user, setUser, setUserStats } = useUserContext();
+  const [userId, setUserId] = useState<string | null>(null);
+
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!token) return;
+
+      try {
+        const { data } = await axiosFetch.get<{
+          success: boolean;
+          id: string;
+        }>("/api/user/id", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!data.success) throw new Error("Not authorized");
+        setUserId(data.id);
+      } catch (error: any) {
+        if (error.response?.status === 429) {
+          console.error("Rate limit exceeded:", error.response.data.message);
+          window.location.replace("/");
+        } else {
+          console.error("Authentication or data fetching error:", error);
+        }
+        setUserId(null);
+      }
+    };
+
+    fetchData();
+  }, [token]);
 
   const handleUpdateUsername = async (platformId: string, username: string) => {
     setError(null);
@@ -172,7 +203,7 @@ export const Profile = () => {
           ))}
         </div>
         <div className=" flex justify-center mt-10">
-          <Link to="/preview" className=" texl-4xl">
+          <Link to={`/preview/${userId}`} className=" texl-4xl">
             <button className="px-4 py-2  rounded-md border border-black bg-white text-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0)] transition duration-200">
               Preview Profile card
             </button>

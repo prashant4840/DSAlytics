@@ -12,33 +12,19 @@ import AboutAndPrivacy from "./pages/About";
 import { UserProvider } from "./contexts/Context";
 import ProtectedRoute from "./components/ProtectedRoutes";
 import PreviewPage from "./pages/Preview";
+import ScrollToTop from "./contexts/ScrollToTop";
 
 const App = () => {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <div className=" outfit">
         <Navbar />
         <Routes>
-          <Route
-            path="/"
-            element={
-              <>
-                <div className="absolute z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.5),rgba(255,255,255,0))]"></div>
-                <Home />
-              </>
-            }
-          />
+          <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route
-            path="/about"
-            element={
-              <>
-                <div className="absolute z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.5),rgba(255,255,255,0))]"></div>
-                <AboutAndPrivacy />
-              </>
-            }
-          />
+          <Route path="/about" element={<AboutAndPrivacy />} />
           <Route path="/preview/:userid" element={<PreviewPage />} />
           <Route
             path="/profile"
