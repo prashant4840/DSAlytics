@@ -1,5 +1,5 @@
 import { FilledButton, HollowButton } from "./ui/Button";
-import { Highlight } from "./ui/hero-highlight";
+import { AnimatedHighlight } from "./ui/hero-highlight";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
@@ -27,9 +27,9 @@ export const Hero = () => {
             duration: 0.5,
             ease: [0.4, 0.0, 0.2, 1],
           }}
-          className="text-2xl pb-5 px-4 md:text-4xl lg:text-5xl font-bold text-black  max-w-4xl leading-relaxed lg:leading-snug text-center mx-auto ">
-          All your DSA stats in{" "}
-          <Highlight className="text-white">one place</Highlight>
+          className="text-2xl pb-5 px-4 md:text-4xl lg:text-5xl font-bold text-black  max-w-4xl leading-relaxed lg:leading-snug text-center mx-auto "
+        >
+          All your DSA stats in <AnimatedHighlight>one place</AnimatedHighlight>
         </motion.h1>
 
         <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl mx-auto animate-slide-down-slow">
