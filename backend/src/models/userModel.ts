@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema({
     interviewbit: String,
     codeforces: String,
   },
+  totalSolved: { type: Number },
 });
 
 const User = mongoose.model("User", userSchema);

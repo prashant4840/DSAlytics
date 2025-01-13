@@ -65,7 +65,7 @@ const PreviewPage = () => {
       const image = canvas.toDataURL("image/png");
       const link = document.createElement("a");
       link.href = image;
-      link.download = `${user?.name}-coding-profile.png`;
+      link.download = `${user?.name}-dsastats.png`;
       link.click();
     } catch (error) {
       console.error("Error generating image:", error);

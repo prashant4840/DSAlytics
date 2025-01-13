@@ -33,7 +33,7 @@ export const Navbar = () => {
           console.error("Rate limit exceeded:", error.response.data.message);
           setRateLimitExceeded(true);
         } else {
-          console.error("Authentication or data fetching error:", error);
+          console.error("Authentication or data fetching error:");
         }
         setUserId(null);
       }
@@ -93,7 +93,7 @@ export const Navbar = () => {
               className={getLinkClasses("/preview")}>
               Preview
             </Link>
-            <Link to="/Leaderboard" className={getLinkClasses("/Leaderboard")}>
+            <Link to="/Leaderboard" className={getLinkClasses("/leaderboard")}>
               Leaderboard
             </Link>
             {!isVisible &&

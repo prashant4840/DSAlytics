@@ -8,6 +8,7 @@ import {
   deleteUser,
   updateUserDetails,
   userId,
+  setTotalSolved,
 } from "../controllers/userController";
 import { protect } from "../middlewares/authMiddleware";
 
@@ -19,6 +20,7 @@ router.post("/login", loginUser as any);
 router.put("/usernames", protect as any, updateUsernames as any);
 router.put("/update", protect as any, updateUserDetails as any);
 router.put("/pfp", protect as any, setUserAvatar as any);
+router.put("/totalsolved", protect as any, setTotalSolved as any);
 
 router.get("/verify", protect as any, verify as any);
 router.get("/id", protect as any, userId as any);

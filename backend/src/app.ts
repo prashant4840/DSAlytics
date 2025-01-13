@@ -5,7 +5,11 @@ import connectDB from "./config/db";
 import userRoutes from "./routes/userRoutes";
 import platformRoutes from "./routes/platformRoutes";
 import rateLimit from "express-rate-limit";
-import { previewPlatformData } from "./controllers/platformController";
+
+import {
+  leaderboardController,
+  previewPlatformData,
+} from "./controllers/publicControllers";
 
 dotenv.config();
 connectDB();
@@ -22,13 +26,26 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
+// let requestCounter = 0;
+
+// // Middleware to log all incoming requests
+// app.use((req, res, next) => {
+//   requestCounter++;
+//   console.log(`Request #${requestCounter} - ${req.method} ${req.originalUrl}`);
+//   next();
+// });
+
 app.get("/", (_req, res) => {
   res.send("DSAStats API");
 });
 
 app.use("/api/user", userRoutes);
-app.use("/api", platformRoutes);
+
+app.use("/api/platform", platformRoutes);
+
 app.get("/preview/:userid", previewPlatformData as any);
+
+app.post("/leaderboard/:page", leaderboardController);
 
 app.use((_req, res) => {
   res.status(404).json({ message: "Invalid route" });

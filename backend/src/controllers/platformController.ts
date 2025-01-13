@@ -19,7 +19,7 @@ const CACHE_TTL = 5 * 60 * 1000; // Cache time-to-live in milliseconds
 
 const getCachedData = async (
   key: string,
-  fetchFunction: () => Promise<PlatformData | null>
+  fetchFunction: () => Promise<PlatformData | null>,
 ): Promise<PlatformData | null> => {
   const currentTime = Date.now();
 
@@ -37,8 +37,8 @@ const getCachedData = async (
 };
 
 // Reusable helper for platform data fetching
-const fetchPlatformData = async (
-  usernames: Record<string, string | undefined>
+export const fetchPlatformData = async (
+  usernames: Record<string, string | undefined>,
 ) => {
   const platforms = {
     gfg: gfgData,
@@ -53,7 +53,7 @@ const fetchPlatformData = async (
     const username = usernames[platform];
     if (username) {
       const data = await getCachedData(`${platform}:${username}`, () =>
-        fetchFunction(username)
+        fetchFunction(username),
       );
       if (data) {
         results[platform] = data;
@@ -62,44 +62,6 @@ const fetchPlatformData = async (
   }
 
   return results;
-};
-
-export const previewPlatformData = async (req: Request, res: Response) => {
-  try {
-    const { userid } = req.params;
-
-    const user = await User.findById(userid).select("name email usernames pfp");
-    if (!user) {
-      return res.status(404).json({ success: false, error: "User not found" });
-    }
-
-    const { usernames } = user;
-    if (!usernames) {
-      return res.status(403).json({
-        success: false,
-        user,
-        error: "Usernames not found",
-      });
-    }
-
-    const filteredUsernames: Record<string, string | undefined> =
-      Object.fromEntries(
-        Object.entries(usernames).filter(([_, v]) => v !== null)
-      ) as Record<string, string | undefined>;
-
-    const results = await fetchPlatformData(filteredUsernames);
-
-    return res.json({
-      success: true,
-      user,
-      userStats: results,
-    });
-  } catch (error: any) {
-    return res.status(500).json({
-      success: false,
-      error: `Failed to fetch data: ${error.message}`,
-    });
-  }
 };
 
 export const platformData = async (req: Request, res: Response) => {
@@ -119,7 +81,7 @@ export const platformData = async (req: Request, res: Response) => {
 
     const filteredUsernames: Record<string, string | undefined> =
       Object.fromEntries(
-        Object.entries(usernames).filter(([_, v]) => v !== null)
+        Object.entries(usernames).filter(([_, v]) => v !== null),
       ) as Record<string, string | undefined>;
 
     const results = await fetchPlatformData(filteredUsernames);
@@ -150,7 +112,7 @@ export const fetchImages = async (req: Request, res: Response) => {
           return [key, data];
         }
         return [key, null];
-      })
+      }),
     );
 
     const responseData = Object.fromEntries(results);

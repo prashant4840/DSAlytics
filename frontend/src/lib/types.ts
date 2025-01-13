@@ -9,6 +9,7 @@ export interface User {
     codeforces?: string;
   };
   pfp?: string;
+  totalSolved?: number;
 }
 
 export interface Platform {
@@ -55,4 +56,18 @@ export interface UserStats {
   leetcode?: PlatformData;
   codeforces?: PlatformData;
   interviewbit?: PlatformData;
+}
+
+export interface LeaderboardUser {
+  userId: string;
+  name: string;
+  pfp: string;
+  totalSolved: number;
+  rank: number;
+}
+
+export interface LeaderboardResponse {
+  users: LeaderboardUser[];
+  currentUser?: LeaderboardUser;
+  totalPages: number;
 }

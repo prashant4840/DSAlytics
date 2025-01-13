@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { BarChart2 } from "lucide-react";
 import { Hero } from "../components/Hero";
-import "./Home.css";
 import { GiProgression } from "react-icons/gi";
 import { MdLeaderboard } from "react-icons/md";
 

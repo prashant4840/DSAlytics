@@ -1,9 +1,8 @@
-import { ExternalLink } from "lucide-react";
 import { BsGithub, BsLinkedin, BsTwitterX } from "react-icons/bs";
 import { Link } from "react-router-dom";
 
 export const Footer = () => (
-  <footer className="bg-gray-50">
+  <footer className="bg-gray-50 sm:rounded-t-[100px] rounded-t-3xl border">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
@@ -24,14 +23,16 @@ export const Footer = () => (
               <a
                 href="https://linktr.ee/nischal.shetty"
                 target="_blank"
-                className="text-gray-600 hover:text-indigo-600">
+                className="text-gray-600 hover:text-indigo-600"
+              >
                 Contact
               </a>
             </li>
             <li>
               <Link
                 to="/about#privacy"
-                className="text-gray-600 hover:text-indigo-600">
+                className="text-gray-600 hover:text-indigo-600"
+              >
                 Privacy Policy
               </Link>
             </li>
@@ -43,19 +44,22 @@ export const Footer = () => (
             <a
               href="https://github.com/nischal-shetty2"
               target="_blank"
-              className="text-gray-600 hover:text-indigo-600">
+              className="text-gray-600 hover:text-indigo-600"
+            >
               <BsGithub className="h-6 w-6" />
             </a>
             <a
               href="https://x.com/nischalshetty02"
               target="_blank"
-              className="text-gray-600 hover:text-indigo-600">
+              className="text-gray-600 hover:text-indigo-600"
+            >
               <BsTwitterX className="h-6 w-6" />
             </a>
             <a
               href="https://linkedin.com/in/nischal-shetty-2ba446272/"
               target="_blank"
-              className="text-gray-600 hover:text-indigo-600">
+              className="text-gray-600 hover:text-indigo-600"
+            >
               <BsLinkedin className="h-6 w-6" />
             </a>
           </div>

@@ -64,8 +64,6 @@ export const PlatformCard = ({
     if (res?.success) {
       setIsEditing(false);
       setError("");
-    } else {
-      setError("Error finding username");
     }
     setIsDisabled(false);
   };
@@ -74,6 +72,7 @@ export const PlatformCard = ({
     const res = await onDelete(platform.id);
     if (res?.success) {
       setIsEditing(false);
+      setNewUsername("");
       setError("");
     } else {
       setError("Error deleting platform");

@@ -73,6 +73,31 @@ export const updateUsernames = async (
   }
 };
 
+export const setTotalSolved = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  // @ts-ignore
+  const { id } = req.user as { id: string };
+  const { totalSolved } = req.body;
+
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    user.totalSolved = totalSolved;
+
+    await user.save();
+
+    return res.json({ success: true });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Error setting total problems solved" });
+  }
+};
+
 export const verify = async (
   req: Request,
   res: Response

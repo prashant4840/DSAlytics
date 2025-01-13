@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { PLATFORMS } from "../lib/types";
+import { PLATFORMS, UserStats } from "../lib/types";
 import axiosFetch from "../lib/axiosFetch";
 import { PlatformCard } from "../components/PlatformCard";
 import { AxiosError } from "axios";
@@ -10,14 +10,23 @@ import { Link } from "react-router-dom";
 
 // Main Profile Component
 export const Profile = () => {
+  const { user, setUser, setUserStats, userStats } = useUserContext();
+
   const [loadingPlatforms, setLoadingPlatforms] = useState<
     Record<string, boolean>
   >({});
   const [error, setError] = useState<string | null>();
-  const { user, setUser, setUserStats } = useUserContext();
   const [userId, setUserId] = useState<string | null>(null);
+  const [totalProblemsSolved, setTotalProblemsSolved] = useState<number>(0);
 
   const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const total = Object.values(userStats || {}).reduce((total, platform) => {
+      return total + (platform?.totalProblemsSolved || 0);
+    }, 0);
+    setTotalProblemsSolved(total);
+  }, [userStats]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -66,12 +75,40 @@ export const Profile = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
       setUser(data);
-      const platformDataResponse = await axiosFetch.get("/api/platform/data", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+
+      const platformDataResponse = await axiosFetch.get<UserStats>(
+        "/api/platform/data",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
       setUserStats(platformDataResponse.data);
+
+      const total = Object.values(platformDataResponse.data || {}).reduce(
+        (total, platform) => {
+          return total + (platform?.totalProblemsSolved || 0);
+        },
+        0
+      );
+
+      if (total <= 0) {
+        setError("Unable to set total problems solved");
+        return { success: false };
+      }
+
+      const totalSolvedResponse = await axiosFetch.put(
+        "/api/user/totalsolved",
+        { totalSolved: total },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (!totalSolvedResponse.data.success) {
+        throw new Error("Could not set total problems solved");
+      }
 
       return { success: true };
     } catch (error: AxiosError | any) {
@@ -188,6 +225,7 @@ export const Profile = () => {
           onPhotoChange={handleUpdatePfp}
           onUserUpdate={handleUpdateUserDetails}
           loadingPlatforms={loadingPlatforms}
+          totalProblemsSolved={totalProblemsSolved}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 max-w-6xl mx-auto">

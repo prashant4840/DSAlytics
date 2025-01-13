@@ -13,6 +13,7 @@ import { UserProvider } from "./contexts/Context";
 import ProtectedRoute from "./components/ProtectedRoutes";
 import PreviewPage from "./pages/Preview";
 import ScrollToTop from "./contexts/ScrollToTop";
+import Leaderboard from "./pages/Leaderboard";
 
 const App = () => {
   return (
@@ -25,6 +26,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/about" element={<AboutAndPrivacy />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/preview/:userid" element={<PreviewPage />} />
           <Route
             path="/profile"

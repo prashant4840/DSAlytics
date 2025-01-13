@@ -11,15 +11,16 @@ interface ProfileHeaderProps {
     email: string;
   }) => Promise<{ success: boolean }>;
   loadingPlatforms: Record<string, boolean>;
+  totalProblemsSolved: number;
 }
 
 export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   onPhotoChange,
   onUserUpdate,
   loadingPlatforms,
+  totalProblemsSolved,
 }) => {
   const { user, userStats } = useUserContext();
-  const [totalProblemsSolved, setTotalProblemsSolved] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<string>(
@@ -43,13 +44,6 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       email: user?.email || "",
     });
   }, [user]);
-
-  useEffect(() => {
-    const total = Object.values(userStats || {}).reduce((total, platform) => {
-      return total + (platform?.totalProblemsSolved || 0);
-    }, 0);
-    setTotalProblemsSolved(total);
-  }, [userStats]);
 
   // Get all available avatar options from userStats
   const avatarOptions = Object.entries(userStats || {})

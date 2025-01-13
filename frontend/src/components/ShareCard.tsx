@@ -5,12 +5,6 @@ import Card from "../components/ui/Card";
 import axiosFetch from "../lib/axiosFetch";
 import { backgrounds } from "../pages/Preview";
 
-const getTotalProblemsSolved = (stats: UserStats) => {
-  return Object.values(stats).reduce((total, platform) => {
-    return total + (platform?.totalProblemsSolved || 0);
-  }, 0);
-};
-
 export const ShareCard = ({
   cardRef,
   numUsernames,
@@ -25,7 +19,10 @@ export const ShareCard = ({
   userStats: UserStats | null;
 }) => {
   const [processedStats, setProcessedStats] = useState<UserStats | null>(null);
-  const [processedUserPfp, setProcessedUserPfp] = useState<string | null>(null);
+  const [processedUserPfp, setProcessedUserPfp] =
+    useState<string>("./defaultpfp.png");
+  const [totalProblemsSolved, setTotalProblemsSolved] = useState<number>(0);
+
   useEffect(() => {
     const processImages = async () => {
       const updatedStats: { [key: string]: UserStats[keyof UserStats] } = {};
@@ -44,12 +41,13 @@ export const ShareCard = ({
 
       try {
         // Send all avatar URLs to the backend
-        const { data } = await axiosFetch.post("/api/platformimg", {
+        const { data } = await axiosFetch.post("/api/platform/img", {
           urls: avatarUrls,
         });
 
         if (data.success) {
-          setProcessedUserPfp(data.imgs.userPfp);
+          setProcessedUserPfp(data.imgs.userPfp || "/defaultpfp.png");
+
           const { imgs } = data;
 
           // Process platform avatars
@@ -71,6 +69,13 @@ export const ShareCard = ({
 
     processImages();
   }, [userStats, user?.pfp]);
+
+  useEffect(() => {
+    const total = Object.values(userStats || {}).reduce((total, platform) => {
+      return total + (platform?.totalProblemsSolved || 0);
+    }, 0);
+    setTotalProblemsSolved(total);
+  }, [userStats]);
 
   const platformEnv = {
     codeforces: import.meta.env.VITE_CODEFORCES + user?.usernames?.codeforces,
@@ -114,7 +119,7 @@ export const ShareCard = ({
               {/* Header Section */}
               <div className="flex flex-col md:flex-row items-center md:space-x-6 md:p-4 p-1 border bg-white rounded-lg shadow-lg">
                 <motion.img
-                  src={processedUserPfp || user?.pfp}
+                  src={processedUserPfp}
                   alt={user?.name}
                   className="w-20 h-20 md:w-28 md:h-28 rounded-full border-2 border-gray-200 shadow-md mb-4 md:mb-0"
                   whileHover={{ scale: 1.05 }}
@@ -129,7 +134,7 @@ export const ShareCard = ({
                   </h1>
                   <div className=" text-center ">
                     <div className="text-4xl md:text-5xl font-extrabold text-blue-600">
-                      {getTotalProblemsSolved(userStats!).toLocaleString()}
+                      {totalProblemsSolved.toLocaleString()}
                     </div>
                     <div className="text-base md:text-lg text-gray-700 font-medium sm:mt-1">
                       Total Problems Solved
@@ -148,16 +153,14 @@ export const ShareCard = ({
                   Object.entries(processedStats).map(
                     ([platform, stats]) =>
                       stats && (
-                        <motion.div
+                        <a
+                          target="_blank"
                           key={platform}
-                          className="bg-gray-50 border rounded-lg p-4 hover:shadow-md transition-all duration-200"
-                          variants={itemAnimation}>
-                          <a
-                            target="_blank"
-                            key={platform}
-                            href={
-                              platformEnv[platform as keyof typeof platformEnv]
-                            }>
+                          className="bg-gray-50 border rounded-lg p-4 hover:shadow-md transition-all duration-200 hover:scale-[102%]"
+                          href={
+                            platformEnv[platform as keyof typeof platformEnv]
+                          }>
+                          <motion.div key={platform} variants={itemAnimation}>
                             <div className="flex items-center justify-between sm:mb-3 sm:pb-2 border-b border-gray-200">
                               <div className="flex items-center sm:space-x-3 space-x-1">
                                 <img
@@ -223,8 +226,8 @@ export const ShareCard = ({
                                 </div>
                               )}
                             </div>
-                          </a>
-                        </motion.div>
+                          </motion.div>
+                        </a>
                       )
                   )}
               </motion.div>

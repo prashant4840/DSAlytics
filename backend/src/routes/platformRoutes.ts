@@ -4,8 +4,8 @@ import { fetchImages, platformData } from "../controllers/platformController";
 
 const router = express.Router();
 
-router.get("/platform/data", protect as any, platformData as any);
+router.get("/data", protect as any, platformData as any);
 
-router.post("/platformimg", fetchImages as any);
+router.post("/img", fetchImages as any);
 
 export default router;
