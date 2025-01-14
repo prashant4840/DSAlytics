@@ -136,10 +136,10 @@ const Leaderboard = () => {
   }
 
   return (
-    <div className="max-w-2xl my-20 sm:mx-auto mx-2 bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all duration-500 hover:shadow-2xl">
+    <div className="max-w-5xl my-20 sm:mx-auto mx-2 bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all duration-500 hover:shadow-2xl">
       <div className="relative p-8 bg-gradient-to-r from-indigo-600 to-indigo-800 text-white overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full bg-white opacity-10 transform -skew-y-6"></div>
-        <h2 className="relative text-3xl font-bold mb-2">Global Leaderboard</h2>
+        <h2 className="relative text-4xl font-bold mb-2">Global Leaderboard</h2>
         <p className="relative text-blue-100 text-sm">
           Ranking based on total problems solved
         </p>

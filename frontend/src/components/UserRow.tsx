@@ -79,7 +79,7 @@ const UserRow = ({
         ${rankDetails.bgBase}
         ${rankDetails.hoverEffect}
         ${user.rank <= 3 ? "animate-fadeInUp" : ""}
-        ${isCurrentUser ? "border-l-4 border-indigo-500" : ""}
+        ${isCurrentUser ? "border-l-4 border-indigo-500" : "border"}
         cursor-pointer overflow-hidden group`}>
       {/* Animated gradient overlay for top 3 */}
       {user.rank <= 3 && (
@@ -122,16 +122,17 @@ const UserRow = ({
 
       <div className="flex-1 ml-4">
         <div className={`font-bold ${rankDetails.textColor}`}>{user.name}</div>
-        <div className="flex flex-col">
-          <span className="text-sm text-gray-600">
-            Problems solved: {user.totalSolved}
-          </span>
+        <span
+          className={`text-sm inline-flex items-center rounded-full px-2 bg-zinc-200 border opacity-90 font-semibold`}>
+          {rankDetails.title}
+        </span>
+      </div>
+      <div className="flex flex-col">
+        <div className="text-sm text-gray-600">
+          <p className=" text-lg text-black text-center">{user.totalSolved}</p>
+          <p>Problems solved</p>
         </div>
       </div>
-      <span
-        className={`text-sm inline-flex items-center rounded-full px-2 py-2 sm:py-1 bg-zinc-50 border opacity-90 font-semibold`}>
-        {rankDetails.title}
-      </span>
     </div>
   );
 };

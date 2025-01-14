@@ -27,15 +27,18 @@ export const Hero = () => {
             duration: 0.5,
             ease: [0.4, 0.0, 0.2, 1],
           }}
-          className="text-2xl pb-5 px-4 md:text-4xl lg:text-5xl font-bold text-black  max-w-4xl leading-relaxed lg:leading-snug text-center mx-auto "
-        >
-          All your DSA stats in <AnimatedHighlight>one place</AnimatedHighlight>
+          className="text-5xl pb-5 px-4 md:text-4xl lg:text-6xl font-bold text-black  max-w-4xl leading-relaxed lg:leading-snug text-center mx-auto ">
+          Share all your DSA stats in{" "}
+          <AnimatedHighlight>one place</AnimatedHighlight>
         </motion.h1>
 
-        <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl mx-auto animate-slide-down">
-          Share your progress across LeetCode, GeeksForGeeks, Codeforces and
-          more. showcase your coding journey in a single place. Get started now!
-        </p>
+        <div className="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl mx-auto animate-slide-down">
+          Share and track your progress across LeetCode, GFG, Codeforces and
+          interviewBit. showcase your coding journey in one place.{" "}
+          <span className="bg-gradient-to-r from-purple-400 to-indigo-600 bg-clip-text text-transparent">
+            Get started now!
+          </span>
+        </div>
         <div className="flex justify-center space-x-4 animate-slide-down-slow">
           <FilledButton to={!hasAccount ? "/signup" : "/profile"}>
             {!hasAccount ? "Create your profile" : "View your profile"}
