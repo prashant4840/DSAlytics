@@ -219,7 +219,7 @@ export const Profile = () => {
 
   return (
     <>
-      <div className="max-w-6xl mx-auto px-4 py-8 mt-12">
+      <div className="max-w-6xl mx-auto px-4 py-8 mt-12 animate-slide-down">
         {error && <Toast message={error} variant="error" />}
         <ProfileHeader
           onPhotoChange={handleUpdatePfp}

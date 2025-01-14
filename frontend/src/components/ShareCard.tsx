@@ -20,7 +20,7 @@ export const ShareCard = ({
 }) => {
   const [processedStats, setProcessedStats] = useState<UserStats | null>(null);
   const [processedUserPfp, setProcessedUserPfp] =
-    useState<string>("./defaultpfp.png");
+    useState<string>("/defaultpfp.png");
   const [totalProblemsSolved, setTotalProblemsSolved] = useState<number>(0);
 
   useEffect(() => {
@@ -102,14 +102,15 @@ export const ShareCard = ({
   return (
     <>
       <motion.div
-        id="capture_div"
-        ref={cardRef}
         className="overflow-hidden"
         initial="hidden"
         animate="visible"
         variants={containerAnimation}>
         <Card className="bg-white shadow-xl rounded-xl mx-2 sm:mx-10 md:mx-20">
-          <div className="md:h-[40rem] sm:h-[43rem] h-[38rem] rounded-xl relative flex items-center justify-center">
+          <div
+            id="capture_div"
+            ref={cardRef}
+            className="md:h-[40rem] sm:h-[43rem] h-[38rem] rounded-xl relative flex items-center justify-center">
             {React.createElement(backgrounds[selectedBackground]?.component)}
             {React.createElement(backgrounds[selectedBackground].component)}
 
@@ -121,7 +122,7 @@ export const ShareCard = ({
                 <motion.img
                   src={processedUserPfp}
                   alt={user?.name}
-                  className="w-20 h-20 md:w-28 md:h-28 rounded-full border-2 border-gray-200 shadow-md mb-4 md:mb-0"
+                  className="w-20 h-20 md:w-28 md:h-28 rounded-full border-2 border-gray-200 shadow-md"
                   whileHover={{ scale: 1.05 }}
                   transition={{ duration: 0.3 }}
                 />
@@ -161,7 +162,7 @@ export const ShareCard = ({
                             platformEnv[platform as keyof typeof platformEnv]
                           }>
                           <motion.div key={platform} variants={itemAnimation}>
-                            <div className="flex items-center justify-between sm:mb-3 sm:pb-2 border-b border-gray-200">
+                            <div className="flex items-center justify-between sm:mb-3 pb-2 border-b border-gray-200">
                               <div className="flex items-center sm:space-x-3 space-x-1">
                                 <img
                                   src={stats.avatar}

@@ -30,9 +30,9 @@ const Home = () => {
       <div className="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)]">
         <div className="absolute pointer-events-none inset-0 flex items-center justify-center  bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_2%,black)]"></div>
       </div>
-      <div className="pt-24 pb-16 sm:pt-40 sm:pb-12 ">
+      <div className="pt-24 sm:pt-40 pb-12 ">
         <div className="relative w-full max-w-4xl mx-auto">
-          <HoverLogo/>
+          <HoverLogo />
           <Hero />
         </div>
       </div>

@@ -17,7 +17,7 @@ const UserRow = ({
           title: "Legendary",
           icon: Trophy,
           bgBase:
-            "bg-[linear-gradient(45deg,transparent_25%,rgba(90,90,90,.2)_50%,transparent_75%,transparent_100%)] bg-gray-50 bg-[length:250%_250%,100%_100%] bg-[position:-20%_0,0_0] bg-no-repeat transition-[background-position_0s_ease] hover:bg-[position:100%_0,0_0] hover:duration-[1000ms]",
+            "bg-[linear-gradient(45deg,transparent_25%,rgba(90,90,90,.2)_50%,transparent_75%,transparent_100%)] bg-gray-50 bg-[length:250%_250%,100%_100%] bg-[position:-20%_0,0_0] bg-no-repeat transition-[background-position_0s_ease] hover:bg-[position:110%_0,0_0] hover:duration-[1000ms]",
           bgOverlay:
             "bg-gradient-to-r from-transparent via-yellow-100 to-transparent",
           hoverEffect: "hover:bg-yellow-100/50",
@@ -31,7 +31,7 @@ const UserRow = ({
           title: "Grandmaster",
           icon: Medal,
           bgBase:
-            "bg-[linear-gradient(45deg,transparent_25%,rgba(90,90,90,.2)_50%,transparent_75%,transparent_100%)] bg-gray-50 bg-[length:250%_250%,100%_100%] bg-[position:-20%_0,0_0] bg-no-repeat transition-[background-position_0s_ease] hover:bg-[position:100%_0,0_0] hover:duration-[1000ms]",
+            "bg-[linear-gradient(45deg,transparent_25%,rgba(90,90,90,.2)_50%,transparent_75%,transparent_100%)] bg-gray-50 bg-[length:250%_250%,100%_100%] bg-[position:-20%_0,0_0] bg-no-repeat transition-[background-position_0s_ease] hover:bg-[position:110%_0,0_0] hover:duration-[1000ms]",
           bgOverlay:
             "bg-gradient-to-r from-transparent via-gray-100 to-transparent",
           hoverEffect: "hover:bg-gray-100/50",
@@ -45,7 +45,7 @@ const UserRow = ({
           title: "Expert",
           icon: Award,
           bgBase:
-            "bg-[linear-gradient(45deg,transparent_25%,rgba(90,90,90,.2)_50%,transparent_75%,transparent_100%)] bg-gray-50 bg-[length:250%_250%,100%_100%] bg-[position:-20%_0,0_0] bg-no-repeat transition-[background-position_0s_ease] hover:bg-[position:100%_0,0_0] hover:duration-[1000ms]",
+            "bg-[linear-gradient(45deg,transparent_25%,rgba(90,90,90,.2)_50%,transparent_75%,transparent_100%)] bg-gray-50 bg-[length:250%_250%,100%_100%] bg-[position:-20%_0,0_0] bg-no-repeat transition-[background-position_0s_ease] hover:bg-[position:110%_0,0_0] hover:duration-[1000ms]",
           bgOverlay:
             "bg-gradient-to-r from-transparent via-yellow-50 to-transparent",
           hoverEffect: "hover:bg-amber-100/50",
@@ -101,7 +101,7 @@ const UserRow = ({
           }`}
         />
         <img
-          src={user.pfp || "./defaultpfp.png"}
+          src={user.pfp || "/defaultpfp.png"}
           alt={`${user.name}'s profile`}
           className={`rounded-full object-cover transition-transform duration-300 group-hover:scale-110 
             ${

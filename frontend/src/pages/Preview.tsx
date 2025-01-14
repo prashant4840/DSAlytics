@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import html2canvas from "html2canvas";
-import { Download, Share2, Link } from "lucide-react";
+import { Download, Link, Share2Icon } from "lucide-react";
 import { motion } from "framer-motion";
 import { ShareCard } from "../components/ShareCard";
 import { User, UserStats } from "../lib/types";
@@ -16,6 +16,7 @@ const PreviewPage = () => {
   const [user, setUser] = useState<User | null>(null);
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isCopied, setIsCopied] = useState<boolean>(false);
 
   const id = useParams().userid;
 
@@ -87,8 +88,16 @@ const PreviewPage = () => {
   };
 
   const handleCopyLink = () => {
+    setIsCopied(true);
     navigator.clipboard.writeText(window.location.href);
   };
+  useEffect(() => {
+    setInterval(() => {
+      if (!isCopied) {
+        setIsCopied(false);
+      }
+    }, 5000);
+  }, [isCopied]);
 
   const numUsernames = Object.values(user?.usernames || {}).filter(
     (username) => username
@@ -100,7 +109,7 @@ const PreviewPage = () => {
 
   if (numUsernames === 0)
     return (
-      <div className="mx-auto dark:bg-zinc-950 py-64 bg-white dark:text-white text-black text-6xl text-center space-y-6 px-20 items-center">
+      <div className="mx-auto dark:bg-zinc-950 py-64 bg-white dark:text-white text-black sm:text-6xl text-lg text-center space-y-6 px-20 items-center">
         Please add your Codeforces | LeetCode | GeeksforGeeks | InterviewBit
         usernames to generate your profile card.
         <div className="flex justify-center mt-10">
@@ -132,22 +141,22 @@ const PreviewPage = () => {
           transition={{ duration: 0.3 }}>
           <button
             onClick={handleShare}
-            className="flex items-center border space-x-2 sm:px-4 px-2 py-1 bg-zinc-900 text-white rounded-lg hover:bg-gray-800 transition-colors">
-            <Share2 className="w-4 h-4" />
+            className="flex items-center border space-x-2 sm:px-4 px-2 py-1 bg-zinc-900 text-white rounded-lg hover:bg-zinc-800 transition-colors">
+            <Share2Icon className="w-4 h-4" />
             <span>Share</span>
           </button>
           <button
             onClick={handleDownload}
             disabled={isGenerating}
-            className="flex items-center border space-x-2 px-4 py-1 bg-zinc-900 text-white rounded-lg hover:bg-gray-800 transition-colors">
+            className="flex items-center border space-x-2 px-4 py-1 bg-zinc-900 text-white rounded-lg hover:bg-zinc-800 transition-colors">
             <Download className="w-4 h-4" />
-            <span>{isGenerating ? "Generating..." : "Download"}</span>
+            <span>{isGenerating ? "Generating" : "Download"}</span>
           </button>
           <button
             onClick={handleCopyLink}
-            className="flex items-center border space-x-2 sm:px-4 px-2 py-1 bg-zinc-900 text-white rounded-lg hover:bg-gray-800 transition-colors">
+            className="flex items-center border space-x-2 sm:px-4 px-2 py-1 bg-zinc-900 text-white rounded-lg hover:bg-zinc-800 transition-colors">
             <Link className="w-4 h-4" />
-            <span>Copy Link</span>
+            <span>{isCopied ? "Copied!" : "Copy Link"}</span>
           </button>
         </motion.div>
 

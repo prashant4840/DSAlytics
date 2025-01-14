@@ -118,12 +118,12 @@ const Login = () => {
                 </label>
               </div>
 
-              <div className="text-sm">
-                <Link
-                  to="/forgot-password"
-                  className="font-medium text-indigo-600 hover:text-indigo-500">
+              <div
+                onClick={() => alert("Just create a new account")}
+                className="text-sm">
+                <p className="font-medium text-indigo-600 hover:text-indigo-500">
                   Forgot password?
-                </Link>
+                </p>
               </div>
             </div>
 

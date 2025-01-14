@@ -24,7 +24,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<string>(
-    user?.pfp || "./defaultpfp.png"
+    user?.pfp || "/defaultpfp.png"
   );
   const [editForm, setEditForm] = useState({
     name: user?.name || "",
@@ -38,7 +38,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   );
 
   useEffect(() => {
-    setSelectedPhoto(user?.pfp || "./defaultpfp.png");
+    setSelectedPhoto(user?.pfp || "/defaultpfp.png");
     setEditForm({
       name: user?.name || "",
       email: user?.email || "",
@@ -161,7 +161,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               }}
               className="flex justify-center w-full text-center border hover:bg-gray-100 rounded-lg p-4 transition-colors">
               <div>
-                <div className=" focus:outline-none focus:ring-2 focus:ring-blue-500 ">
+                <div className=" focus:outline-none focus:ring-2 focus:ring-blue-500 justify-center flex ">
                   <img
                     src={selectedPhoto}
                     className="w-16 h-16 sm:w-24 sm:h-24 rounded-full hover:scale-105 transition duration-300"
@@ -207,7 +207,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50">
+                className="flex-1 bg-blue-500 text-white py-2 text-nowrap px-4 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50">
                 {isSubmitting ? "Saving..." : "Save Changes"}
               </button>
               <button
@@ -241,13 +241,13 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         <div className="grid grid-cols-2 gap-4">
           <div
             className="p-4 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-            onClick={() => handlePhotoSelect("./defaultpfp.png")}>
+            onClick={() => handlePhotoSelect("/defaultpfp.png")}>
             <div className="flex flex-col items-center space-y-2">
               <img
-                src="./defaultpfp.png"
+                src="/defaultpfp.png"
                 alt="Default profile"
                 className={`w-16 h-16 rounded-full border-2 ${
-                  selectedPhoto === "./defaultpfp.png"
+                  selectedPhoto === "/defaultpfp.png"
                     ? "border-blue-500"
                     : "border-gray-200"
                 }`}

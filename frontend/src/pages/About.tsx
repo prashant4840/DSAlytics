@@ -5,8 +5,8 @@ const AboutAndPrivacy: React.FC = () => {
     <>
       <div className="absolute z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.5),rgba(255,255,255,0))]"></div>
 
-      <div className="flex flex-col  items-center text-gray-800 ">
-        <section className="max-w-3xl w-full my-20 ">
+      <div className="flex flex-col items-center text-gray-800 ">
+        <section className="max-w-3xl sm:w-full my-20 mx-10">
           <h1 className="text-3xl font-bold mb-4">About</h1>
           <p className="text-lg leading-relaxed">
             Welcome to DSA Stats! My mission is to bring all your coding and DSA
@@ -23,8 +23,7 @@ const AboutAndPrivacy: React.FC = () => {
 
         <section
           id="privacy"
-          className="max-w-3xl w-full text-white bg-zinc-900 mb-20 p-10"
-        >
+          className="max-w-3xl w-full text-white bg-zinc-900 mb-20 p-10">
           <h2 className="text-2xl font-bold mb-4">Privacy Policy</h2>
           <p className="text-lg leading-relaxed">
             We respect your privacy and are committed to protecting your data.
@@ -34,8 +33,7 @@ const AboutAndPrivacy: React.FC = () => {
             <a
               className=" text-blue-500"
               href="https://x.com/nischalshetty02"
-              target="_blank"
-            >
+              target="_blank">
               me
             </a>
           </p>

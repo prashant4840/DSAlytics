@@ -45,13 +45,13 @@ export const Navbar = () => {
   const getLinkClasses = (path: string) => {
     if (textDark) {
       return path.startsWith("/preview")
-        ? "text-indigo-600 underline underline-offset-4 flex max-w-max "
-        : "hover:text-indigo-600 dark:text-white text-black transition-colors flex";
+        ? "text-indigo-600 underline text-xl underline-offset-4 flex max-w-max "
+        : "hover:text-indigo-600 dark:text-white text-xl text-black transition-colors flex";
     }
 
     return currentUrl === path
-      ? "text-indigo-600 border-b-2 border-indigo-600 flex max-w-max"
-      : "text-black hover:text-indigo-600 transition-colors flex";
+      ? "text-indigo-600 border-b-2 text-xl border-indigo-600 flex max-w-max"
+      : "text-black hover:text-indigo-600 text-xl transition-colors flex";
   };
 
   const handleLogout = () => {
@@ -93,19 +93,19 @@ export const Navbar = () => {
               className={getLinkClasses("/preview")}>
               Preview
             </Link>
-            <Link to="/Leaderboard" className={getLinkClasses("/leaderboard")}>
+            <Link to="/leaderboard" className={getLinkClasses("/leaderboard")}>
               Leaderboard
             </Link>
             {!isVisible &&
               (token ? (
                 <button
                   onClick={handleLogout}
-                  className="text-gray-500 border border-gray-500 px-3 rounded-lg hover:text-indigo-600 transition-colors flex">
+                  className="text-gray-500 text-xl border border-gray-500 px-3 rounded-lg hover:text-indigo-600 transition-colors flex">
                   Log Out
                 </button>
               ) : (
                 <Link to={"/login"}>
-                  <div className="text-gray-500 border border-gray-500 line px-3 rounded-lg hover:text-indigo-600 transition-colors flex">
+                  <div className="text-gray-500 text-xl border border-gray-500 line px-3 rounded-lg hover:text-indigo-600 transition-colors flex">
                     Log in
                   </div>
                 </Link>
@@ -133,19 +133,19 @@ export const Navbar = () => {
               className={getLinkClasses("/preview")}>
               Preview
             </Link>
-            <Link to="/Leaderboard" className={getLinkClasses("/Leaderboard")}>
+            <Link to="/leaderboard" className={getLinkClasses("/leaderboard")}>
               Leaderboard
             </Link>
             {!isVisible &&
               (token ? (
                 <button
                   onClick={handleLogout}
-                  className=" text-gray-500  rounded-lg transition-colors flex">
+                  className=" text-gray-500 text-xl rounded-lg transition-colors flex">
                   Log Out
                 </button>
               ) : (
                 <Link to={"/login"}>
-                  <div className=" text-gray-500  mt-2 underline rounded-lg transition-colors flex">
+                  <div className=" text-gray-500 text-xl mt-2 underline rounded-lg transition-colors flex">
                     Log in
                   </div>
                 </Link>
