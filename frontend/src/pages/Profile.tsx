@@ -51,7 +51,7 @@ export const Profile = () => {
     };
 
     fetchData();
-  }, [token]);
+  }, []);
 
   const handleUpdateUsername = async (platformId: string, username: string) => {
     setError(null);

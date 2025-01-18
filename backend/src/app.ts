@@ -21,7 +21,6 @@ app.use(
     origin: [
       "https://dsastats.zreo.xyz",
       "https://dsastats.fun",
-      "https://www.dsastats.fun",
       "https://dsastat.vercel.app",
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
