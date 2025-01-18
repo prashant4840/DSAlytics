@@ -20,7 +20,7 @@ app.use(
   cors({
     origin: [
       "https://dsastats.zreo.xyz",
-      "https://dsastats.xyz",
+      "https://dsastats.fun",
       "https://dsastat.vercel.app",
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
