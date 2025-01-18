@@ -21,6 +21,7 @@ app.use(
     origin: [
       "https://dsastats.zreo.xyz",
       "https://dsastats.fun",
+      "https://www.dsastats.fun",
       "https://dsastat.vercel.app",
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
@@ -30,8 +31,8 @@ app.use(
 app.use(express.json());
 
 const limiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minutes
-  max: 25, // limit each IP to 25 requests per windowMs
+  windowMs: 1 * 30 * 1000, // 1 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
   message: "Too many requests from this IP, please try again after 15 minutes",
 });
 
