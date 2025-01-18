@@ -12,6 +12,8 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,6 +24,7 @@ const Signup = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setIsLoading(true);
     if (!email || !password || !name) {
       setError("Enter valid details");
     }
@@ -40,6 +43,8 @@ const Signup = () => {
       }
     } catch (error) {
       setError("Error Signing up");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -134,9 +139,19 @@ const Signup = () => {
             </div>
 
             <button
+              disabled={isLoading}
               type="submit"
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-              Create account
+              {isLoading ? (
+                <div className="flex space-x-2 justify-center items-center">
+                  <span className="sr-only">Loading...</span>
+                  <div className="h-5 w-1 bg-white rounded-full animate-pulse [animation-delay:-0.3s] text-xl"></div>
+                  <div className="h-5 w-1 bg-white rounded-full animate-pulse [animation-delay:-0.15s] text-xl"></div>
+                  <div className="h-5 w-1 bg-white rounded-full animate-pulse text-xl"></div>
+                </div>
+              ) : (
+                "Create account"
+              )}
             </button>
           </form>
 
@@ -145,7 +160,7 @@ const Signup = () => {
             <Link
               to="/login"
               className="font-medium text-indigo-600 hover:text-indigo-500">
-              Sign in
+              Login
             </Link>
           </p>
         </motion.div>
