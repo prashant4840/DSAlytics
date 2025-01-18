@@ -18,7 +18,11 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["https://dsastats.zreo.xyz"],
+    origin: [
+      "https://dsastats.zreo.xyz",
+      "https://dsastats.xyz",
+      "https://dsastat.vercel.app",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
