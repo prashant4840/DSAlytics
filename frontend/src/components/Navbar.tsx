@@ -19,10 +19,7 @@ export const Navbar = () => {
       if (!token || rateLimitExceeded) return; // Avoid infinite requests
 
       try {
-        const { data } = await axiosFetch.get<{
-          success: boolean;
-          id: string;
-        }>("/api/user/id", {
+        const { data } = await axiosFetch.get("/api/user/id", {
           headers: { Authorization: `Bearer ${token}` },
         });
 

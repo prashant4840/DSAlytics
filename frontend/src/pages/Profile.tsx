@@ -33,10 +33,7 @@ export const Profile = () => {
       if (!token) return;
 
       try {
-        const { data } = await axiosFetch.get<{
-          success: boolean;
-          id: string;
-        }>("/api/user/id", {
+        const { data } = await axiosFetch.get("/api/user/id", {
           headers: { Authorization: `Bearer ${token}` },
         });
 

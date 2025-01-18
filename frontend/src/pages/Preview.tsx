@@ -23,6 +23,10 @@ const PreviewPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
+      if (id === "null") {
+        setIsLoading(false);
+        return;
+      }
       try {
         const { data } = await axiosFetch.get<{
           success: boolean;
