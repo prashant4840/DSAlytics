@@ -142,7 +142,8 @@ export const Profile = () => {
         },
         0
       );
-      if (total <= 0) {
+
+      if (total < 0) {
         setError("Unable to set total problems solved");
         return { success: false };
       }
