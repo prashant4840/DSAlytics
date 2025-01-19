@@ -7,6 +7,7 @@ import { User, UserStats } from "../lib/types";
 import { useParams } from "react-router-dom";
 import axiosFetch from "../lib/axiosFetch";
 import LoadingPage from "./Loading";
+import Toast from "../components/ui/Toast";
 
 const PreviewPage = () => {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -17,11 +18,13 @@ const PreviewPage = () => {
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isCopied, setIsCopied] = useState<boolean>(false);
+  const [isError, setIsError] = useState<string | null>(null);
 
   const id = useParams().userid;
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsError(null);
       setIsLoading(true);
       if (id === "null") {
         setIsLoading(false);
@@ -46,6 +49,7 @@ const PreviewPage = () => {
           window.location.href = "/";
         } else {
           console.error("Authentication or data fetching error:", error);
+          setIsError("Authentication Error");
         }
       } finally {
         setIsLoading(false);
@@ -58,6 +62,7 @@ const PreviewPage = () => {
   const canCustomize = localStorage.getItem("token") !== null;
 
   const handleDownload = async () => {
+    setIsError(null);
     if (!cardRef.current) return;
     setIsGenerating(true);
 
@@ -74,12 +79,14 @@ const PreviewPage = () => {
       link.click();
     } catch (error) {
       console.error("Error generating image:", error);
+      setIsError("Error Generating image");
     } finally {
       setIsGenerating(false);
     }
   };
 
   const handleShare = async () => {
+    setIsError(null);
     try {
       await navigator.share({
         title: `${user?.name}'s DSA Profile`,
@@ -88,6 +95,7 @@ const PreviewPage = () => {
       });
     } catch (error) {
       console.error("Error sharing:", error);
+      setIsError("Error sharing");
     }
   };
 
@@ -108,26 +116,35 @@ const PreviewPage = () => {
   ).length;
 
   if (isLoading) {
-    return <LoadingPage />;
+    return (
+      <div>
+        {isError && <Toast message={isError} variant="error" />}
+        <LoadingPage />
+      </div>
+    );
   }
 
   if (numUsernames === 0)
     return (
-      <div className="mx-auto dark:bg-zinc-950 py-64 bg-white dark:text-white text-black sm:text-6xl text-lg text-center space-y-6 px-20 items-center">
-        Please add your Codeforces | LeetCode | GeeksforGeeks | InterviewBit
-        usernames to generate your profile card.
-        <div className="flex justify-center mt-10">
-          <a
-            href="/profile"
-            className="px-4 py-2 cursor-pointer rounded-md border text-lg  dark:border-black border-white bg-black dark:bg-white text-white dark:text-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0)] dark:hover:shadow-[4px_4px_0px_0px_rgba(255,255,255)] transition duration-200">
-            Add usernames
-          </a>
+      <>
+        {isError && <Toast message={isError} variant="error" />}
+        <div className="mx-auto dark:bg-zinc-950 py-64 bg-white dark:text-white text-black sm:text-6xl text-lg text-center space-y-6 px-20 items-center">
+          Please add your Codeforces | LeetCode | GeeksforGeeks | InterviewBit
+          usernames to generate your profile card.
+          <div className="flex justify-center mt-10">
+            <a
+              href="/profile"
+              className="px-4 py-2 cursor-pointer rounded-md border text-lg  dark:border-black border-white bg-black dark:bg-white text-white dark:text-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0)] dark:hover:shadow-[4px_4px_0px_0px_rgba(255,255,255)] transition duration-200">
+              Add usernames
+            </a>
+          </div>
         </div>
-      </div>
+      </>
     );
 
   return (
     <div className="mx-auto dark:bg-zinc-950 bg-white space-y-6 py-20 px-4 md:px-20 items-center">
+      {isError && <Toast message={isError} variant="error" />}
       <div className="max-w-xl mx-auto">
         <ShareCard
           cardRef={cardRef}

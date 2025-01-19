@@ -30,7 +30,7 @@ export const Navbar = () => {
           console.error("Rate limit exceeded:", error.response.data.message);
           setRateLimitExceeded(true);
         } else {
-          console.error("Authentication or data fetching error:");
+          console.error("Authentication or data fetching error");
         }
         setUserId(null);
       }

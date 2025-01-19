@@ -51,7 +51,7 @@ export const Profile = () => {
     };
 
     fetchData();
-  }, []);
+  }, [token]);
 
   const handleUpdateUsername = async (platformId: string, username: string) => {
     setError(null);
@@ -76,11 +76,8 @@ export const Profile = () => {
 
       const platformDataResponse = await axiosFetch.get<UserStats>(
         "/api/platform/data",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
       setUserStats(platformDataResponse.data);
 
       const total = Object.values(platformDataResponse.data || {}).reduce(
@@ -89,7 +86,6 @@ export const Profile = () => {
         },
         0
       );
-
       if (total <= 0) {
         setError("Unable to set total problems solved");
         return { success: false };
@@ -133,10 +129,35 @@ export const Profile = () => {
       });
 
       setUser(data);
-      const platformDataResponse = await axiosFetch.get("/api/platform/data", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (platformDataResponse.data) setUserStats(platformDataResponse.data);
+
+      const platformDataResponse = await axiosFetch.get<UserStats>(
+        "/api/platform/data",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setUserStats(platformDataResponse.data);
+
+      const total = Object.values(platformDataResponse.data || {}).reduce(
+        (total, platform) => {
+          return total + (platform?.totalProblemsSolved || 0);
+        },
+        0
+      );
+      if (total <= 0) {
+        setError("Unable to set total problems solved");
+        return { success: false };
+      }
+
+      const totalSolvedResponse = await axiosFetch.put(
+        "/api/user/totalsolved",
+        { totalSolved: total },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (!totalSolvedResponse.data.success) {
+        throw new Error("Could not set total problems solved");
+      }
 
       return { success: true };
     } catch (error: AxiosError | any) {

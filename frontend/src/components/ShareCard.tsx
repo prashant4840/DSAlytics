@@ -196,16 +196,17 @@ export const ShareCard = ({
                                   </span>
                                 </div>
                               )}
-                              {"universityRank" in stats && (
-                                <div className="flex justify-between items-center">
-                                  <span className="text-gray-600">
-                                    University Rank :{" "}
-                                  </span>
-                                  <span className="font-semibold">
-                                    {stats.universityRank.toLocaleString()}
-                                  </span>
-                                </div>
-                              )}
+                              {"universityRank" in stats &&
+                                stats.universityRank !== "" && (
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-gray-600">
+                                      University Rank :{" "}
+                                    </span>
+                                    <span className="font-semibold">
+                                      {stats.universityRank.toLocaleString()}
+                                    </span>
+                                  </div>
+                                )}
                               {"maxRating" in stats && (
                                 <div className="flex justify-between items-center">
                                   <span className="text-gray-600">

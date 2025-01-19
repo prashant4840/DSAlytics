@@ -44,11 +44,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
         setIsAuthenticated(true);
       } catch (error: any) {
         if (error.response?.status === 429) {
-          console.error("Rate limit exceeded:", error.response.data.message);
-          window.location.href = "/";
+          console.error("Rate limit exceeded:", error.response.data.message); 
         } else {
           console.error("Authentication or data fetching error:", error);
         }
+        window.location.href = "/";
         setIsAuthenticated(false);
       }
     };
