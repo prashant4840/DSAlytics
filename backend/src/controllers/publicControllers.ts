@@ -72,10 +72,11 @@ export const leaderboardController = async (req: Request, res: Response) => {
     const totalUsers = await User.countDocuments({
       totalSolved: { $exists: true },
     });
+
     const totalPages = Math.ceil(totalUsers / itemsPerPage);
 
     const users = await User.find({ totalSolved: { $exists: true } })
-      .sort({ totalSolved: -1 })
+      .sort({ totalSolved: -1, _id: 1 })
       .skip((pageNumber - 1) * itemsPerPage)
       .limit(itemsPerPage);
 

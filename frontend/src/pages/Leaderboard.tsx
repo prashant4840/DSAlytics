@@ -162,23 +162,25 @@ const Leaderboard = () => {
         ) : (
           <div className="transition-all duration-500">
             <div className="p-4 font-medium text-gray-600">Global Ranking</div>
-            {leaderboardData?.users.map((user, index) => (
-              <div
-                key={user.userId}
-                className="transform transition-all duration-500"
-                style={{
-                  animationDelay: `${index * 100}ms`,
-                  opacity: 1 - index * 0.02,
-                }}>
-                <UserRow
-                  user={user}
-                  isCurrentUser={
-                    user.userId === leaderboardData?.currentUser?.userId
-                  }
-                  handleProfileClick={handleProfileClick}
-                />
-              </div>
-            ))}
+            {leaderboardData?.users
+              .filter((user) => user.totalSolved > 0)
+              .map((user, index) => (
+                <div
+                  key={user.userId}
+                  className="transform transition-all duration-500"
+                  style={{
+                    animationDelay: `${index * 100}ms`,
+                    opacity: 1 - index * 0.02,
+                  }}>
+                  <UserRow
+                    user={user}
+                    isCurrentUser={
+                      user.userId === leaderboardData?.currentUser?.userId
+                    }
+                    handleProfileClick={handleProfileClick}
+                  />
+                </div>
+              ))}
           </div>
         )}
       </div>
