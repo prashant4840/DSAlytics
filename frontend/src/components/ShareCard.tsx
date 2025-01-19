@@ -178,7 +178,7 @@ export const ShareCard = ({
                               <span className="font-bold text-blue-600 flex justify-center">
                                 {stats.totalProblemsSolved} solved
                               </span>
-                              {"rating" in stats && (
+                              {stats.rating != null && "rating" in stats && (
                                 <div className="flex justify-between items-center">
                                   <span className="text-gray-600">Rating </span>
                                   <span className="font-semibold">
@@ -186,7 +186,7 @@ export const ShareCard = ({
                                   </span>
                                 </div>
                               )}
-                              {"rank" in stats && (
+                              {stats.rank != null && "rank" in stats && (
                                 <div className="flex justify-between ">
                                   <span className="text-gray-600">Rank </span>
                                   <span className="font-semibold ">
@@ -207,26 +207,28 @@ export const ShareCard = ({
                                     </span>
                                   </div>
                                 )}
-                              {"maxRating" in stats && (
-                                <div className="flex justify-between items-center">
-                                  <span className="text-gray-600">
-                                    Max rating{" "}
-                                  </span>
-                                  <span className="font-semibold">
-                                    {stats.maxRating.toLocaleString()}
-                                  </span>
-                                </div>
-                              )}
-                              {"contestGlobalRank" in stats && (
-                                <div className="flex justify-between items-center">
-                                  <span className="text-gray-600">
-                                    Contest{" "}
-                                  </span>
-                                  <span className="font-semibold">
-                                    {stats.contestGlobalRank.toLocaleString()}
-                                  </span>
-                                </div>
-                              )}
+                              {stats.maxRating != null &&
+                                "maxRating" in stats && (
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-gray-600">
+                                      Max rating{" "}
+                                    </span>
+                                    <span className="font-semibold">
+                                      {stats.maxRating.toLocaleString()}
+                                    </span>
+                                  </div>
+                                )}
+                              {stats.contestGlobalRank != null &&
+                                "contestGlobalRank" in stats && (
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-gray-600">
+                                      Contest{" "}
+                                    </span>
+                                    <span className="font-semibold">
+                                      {stats.contestGlobalRank.toLocaleString()}
+                                    </span>
+                                  </div>
+                                )}
                             </div>
                           </motion.div>
                         </a>
