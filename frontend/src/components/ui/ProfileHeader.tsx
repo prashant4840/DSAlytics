@@ -74,7 +74,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       } else {
         setError("Failed to update profile");
       }
-    } catch (err) {
+    } catch {
       setError("An error occurred while updating profile");
     } finally {
       setIsSubmitting(false);

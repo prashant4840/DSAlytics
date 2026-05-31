@@ -17,7 +17,7 @@ const Login = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) navigate("/profile");
-  }, []);
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +35,7 @@ const Login = () => {
       } else {
         throw new Error(response.data.message);
       }
-    } catch (error: any) {
+    } catch {
       setError("Error logging in");
     } finally {
       setIsLoading(false);

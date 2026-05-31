@@ -32,7 +32,7 @@ const AboutAndPrivacy: React.FC = () => {
             to contact{" "}
             <a
               className=" text-blue-500"
-              href="https://x.com/nischalshetty02"
+              href="mailto:prashantsharma4840@icloud.com"
               target="_blank">
               me
             </a>

@@ -1,4 +1,4 @@
-import { BsGithub, BsLinkedin, BsTwitterX } from "react-icons/bs";
+import { BsGithub } from "react-icons/bs";
 import { Link } from "react-router-dom";
 
 export const Footer = () => (
@@ -21,8 +21,7 @@ export const Footer = () => (
             </li>
             <li>
               <a
-                href="https://linktr.ee/nischal.shetty"
-                target="_blank"
+                href="mailto:prashantsharma4840@icloud.com"
                 className="text-gray-600 hover:text-indigo-600"
               >
                 Contact
@@ -42,25 +41,11 @@ export const Footer = () => (
           <h3 className="font-semibold text-gray-900 mb-4">Connect</h3>
           <div className="flex space-x-4">
             <a
-              href="https://github.com/nischal-shetty2"
+              href="https://github.com/prashant4840"
               target="_blank"
               className="text-gray-600 hover:text-indigo-600"
             >
               <BsGithub className="h-6 w-6" />
-            </a>
-            <a
-              href="https://x.com/nischalshetty02"
-              target="_blank"
-              className="text-gray-600 hover:text-indigo-600"
-            >
-              <BsTwitterX className="h-6 w-6" />
-            </a>
-            <a
-              href="https://linkedin.com/in/nischal-shetty-2ba446272/"
-              target="_blank"
-              className="text-gray-600 hover:text-indigo-600"
-            >
-              <BsLinkedin className="h-6 w-6" />
             </a>
           </div>
         </div>

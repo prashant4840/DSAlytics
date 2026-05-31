@@ -43,9 +43,10 @@ const PreviewPage = () => {
         } else {
           throw new Error("User not found");
         }
-      } catch (error: any) {
-        if (error.response?.status === 429) {
-          console.error("Rate limit exceeded:", error.response.data.message);
+      } catch (error) {
+        const err = error as { response?: { status: number; data?: { message?: string } } };
+        if (err.response?.status === 429) {
+          console.error("Rate limit exceeded:", err.response.data?.message);
           window.location.href = "/";
         } else {
           console.error("Authentication or data fetching error:", error);
@@ -57,7 +58,7 @@ const PreviewPage = () => {
     };
 
     fetchData();
-  }, [setUser, setUserStats]);
+  }, [id, setUser, setUserStats]);
 
   const canCustomize = localStorage.getItem("token") !== null;
 
@@ -192,7 +193,7 @@ const PreviewPage = () => {
               {Object.keys(backgrounds).map((bg) => (
                 <div key={bg} className="flex flex-col items-center gap-2">
                   <BackgroundPreview
-                    bg={bg}
+                    bg={bg as keyof typeof backgrounds}
                     isSelected={selectedBackground === bg}
                     onClick={() =>
                       setSelectedBackground(bg as keyof typeof backgrounds)
@@ -250,7 +251,15 @@ export const backgrounds = {
   },
 };
 
-const BackgroundPreview = ({ bg, isSelected, onClick }: any) => (
+const BackgroundPreview = ({
+  bg,
+  isSelected,
+  onClick,
+}: {
+  bg: keyof typeof backgrounds;
+  isSelected: boolean;
+  onClick: () => void;
+}) => (
   <button
     onClick={onClick}
     className={`relative w-12 h-12 rounded-full overflow-hidden border-2 transition-all ${

@@ -39,9 +39,10 @@ export const Profile = () => {
 
         if (!data.success) throw new Error("Not authorized");
         setUserId(data.id);
-      } catch (error: any) {
-        if (error.response?.status === 429) {
-          console.error("Rate limit exceeded:", error.response.data.message);
+      } catch (error) {
+        const err = error as AxiosError<{ message?: string }>;
+        if (err.response?.status === 429) {
+          console.error("Rate limit exceeded:", err.response.data?.message);
           window.location.replace("/");
         } else {
           console.error("Authentication or data fetching error:", error);
@@ -104,8 +105,9 @@ export const Profile = () => {
       }
 
       return { success: true };
-    } catch (error: AxiosError | any) {
-      setError("Error updating username: " + error.response?.data.message);
+    } catch (error) {
+      const err = error as AxiosError<{ message?: string }>;
+      setError("Error updating username: " + err.response?.data?.message);
       return { success: false };
     } finally {
       setLoadingPlatforms((prev) => ({ ...prev, [platformId]: false }));
@@ -161,8 +163,9 @@ export const Profile = () => {
       }
 
       return { success: true };
-    } catch (error: AxiosError | any) {
-      setError("Error deleting username: " + error.response?.data.message);
+    } catch (error) {
+      const err = error as AxiosError<{ message?: string }>;
+      setError("Error deleting username: " + err.response?.data?.message);
       return { success: false };
     } finally {
       setLoadingPlatforms((prev) => ({ ...prev, [platformId]: false }));
@@ -201,8 +204,9 @@ export const Profile = () => {
 
       setUser(data);
       return { success: true };
-    } catch (error: AxiosError | any) {
-      setError("Error updating profile photo:" + error.response?.data.message);
+    } catch (error) {
+      const err = error as AxiosError<{ message?: string }>;
+      setError("Error updating profile photo: " + err.response?.data?.message);
       return { success: false };
     }
   };
@@ -230,8 +234,9 @@ export const Profile = () => {
 
       setUser(data);
       return { success: true };
-    } catch (error: AxiosError | any) {
-      setError("Error updating user details: " + error.response?.data.message);
+    } catch (error) {
+      const err = error as AxiosError<{ message?: string }>;
+      setError("Error updating user details: " + err.response?.data?.message);
       return { success: false };
     }
   };

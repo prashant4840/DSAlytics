@@ -19,7 +19,7 @@ const Signup = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) navigate("/profile");
-  }, []);
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +41,7 @@ const Signup = () => {
       } else {
         throw new Error(response.data.message);
       }
-    } catch (error) {
+    } catch {
       setError("Error Signing up");
     } finally {
       setIsLoading(false);

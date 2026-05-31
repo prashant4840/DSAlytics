@@ -12,7 +12,7 @@ export const ShareCard = ({
   user,
   userStats,
 }: {
-  cardRef: any;
+  cardRef: React.RefObject<HTMLDivElement>;
   numUsernames: number;
   selectedBackground: keyof typeof backgrounds;
   user: User | null;

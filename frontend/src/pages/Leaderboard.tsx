@@ -21,7 +21,7 @@ const Leaderboard = () => {
     setIsLoading(true);
     setError(null);
     try {
-      let token = localStorage.getItem("token");
+      const token = localStorage.getItem("token");
       const headers: Record<string, string> = token
         ? { Authorization: `Bearer ${token}` }
         : {};
@@ -32,7 +32,7 @@ const Leaderboard = () => {
         { headers }
       );
       if (data) setLeaderboardData(data);
-    } catch (err) {
+    } catch {
       setError("Failed to fetch leaderboard data");
     } finally {
       setIsLoading(false);
@@ -44,6 +44,7 @@ const Leaderboard = () => {
 
   useEffect(() => {
     fetchLeaderboardData(currentPage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]);
 
   const handleProfileClick = (userId: string) => {
