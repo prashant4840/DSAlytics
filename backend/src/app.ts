@@ -22,7 +22,9 @@ app.use(
       "https://dsastats.zreo.xyz",
       "https://dsastats.fun",
       "https://dsastat.vercel.app",
-      // "http://localhost:5173",
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "http://localhost:5000"
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
   })

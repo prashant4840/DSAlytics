@@ -106,7 +106,7 @@ export const LeetcodeData = async (username: string) => {
     const userProfileConfig = {
       method: "post",
       maxBodyLength: Infinity,
-      url: process.env.VITE_LEETCODE,
+      url: process.env.VITE_LEETCODE || "https://leetcode.com/graphql",
       headers: {
         "Content-Type": "application/json",
       },
@@ -136,7 +136,7 @@ export const LeetcodeData = async (username: string) => {
     const userContestConfig = {
       method: "post",
       maxBodyLength: Infinity,
-      url: process.env.VITE_LEETCODE,
+      url: process.env.VITE_LEETCODE || "https://leetcode.com/graphql",
       headers: {
         "Content-Type": "application/json",
       },
@@ -169,7 +169,8 @@ export const LeetcodeData = async (username: string) => {
 
 export const gfgData = async (username: string) => {
   try {
-    const response = await axios.get(`${process.env.VITE_GFG}${username}`);
+    const gfgBase = process.env.VITE_GFG || "https://gfg-api-one.vercel.app/api/";
+    const response = await axios.get(`${gfgBase}${username}`);
     const combinedResponse: PlatformData = {
       avatar: response.data.data.profile_image_url,
       totalProblemsSolved: response.data.data.total_problems_solved,
@@ -185,11 +186,11 @@ export const gfgData = async (username: string) => {
 
 export const codeforcesData = async (username: string) => {
   try {
+    const cfBase = process.env.VITE_CODEFORCES || "https://codeforces.com/api/user.info?handles=";
+    const cfSubBase = process.env.VITE_CODEFORCES_SUBMISSIONS || "https://codeforces.com/api/user.status?handle=";
     const [response, response2] = await Promise.all([
-      axios.get(`${process.env.VITE_CODEFORCES}${username}`),
-      axios.get(
-        `${process.env.VITE_CODEFORCES_SUBMISSIONS}${username}&from=1&count=10000`
-      ),
+      axios.get(`${cfBase}${username}`),
+      axios.get(`${cfSubBase}${username}&from=1&count=10000`),
     ]);
 
     if (response.data.status !== "OK") {
@@ -227,9 +228,11 @@ export const codeforcesData = async (username: string) => {
 
 export const interviewbitData = async (username: string) => {
   try {
+    const ibBase = process.env.VITE_INTERVIEWBIT || "https://interviewbit-api.vercel.app/api/profile/";
+    const ibSubBase = process.env.VITE_INTERVIEWBIT_SUBMISSIONS || "https://interviewbit-api.vercel.app/api/submissions/";
     const [response, response2] = await Promise.all([
-      axios.get(`${process.env.VITE_INTERVIEWBIT}${username}`),
-      axios.get(`${process.env.VITE_INTERVIEWBIT_SUBMISSIONS}${username}`),
+      axios.get(`${ibBase}${username}`),
+      axios.get(`${ibSubBase}${username}`),
     ]);
 
     const rank = response.data.global_rank;
