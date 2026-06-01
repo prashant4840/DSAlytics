@@ -124,8 +124,8 @@ const Login = () => {
               </div>
 
               <div
-                onClick={() => alert("Just create a new account")}
-                className="text-sm">
+                onClick={() => setError("Password reset is not configured. Please contact support or register a new account.")}
+                className="text-sm cursor-pointer">
                 <p className="font-medium text-indigo-600 hover:text-indigo-500">
                   Forgot password?
                 </p>

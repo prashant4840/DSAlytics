@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, RequestHandler } from "express";
 import User from "../models/userModel";
 import {
   codeforcesData,
@@ -16,12 +16,28 @@ interface CachedData {
 
 const cache: Record<string, CachedData> = {};
 const CACHE_TTL = 5 * 60 * 1000; // Cache time-to-live in milliseconds
+const MAX_CACHE_SIZE = 1000;
 
 const getCachedData = async (
   key: string,
   fetchFunction: () => Promise<PlatformData | null>,
 ): Promise<PlatformData | null> => {
   const currentTime = Date.now();
+
+  // Lazy eviction and size constraint to prevent unbounded memory growth (W-B3)
+  if (Object.keys(cache).length >= MAX_CACHE_SIZE) {
+    for (const cacheKey in cache) {
+      if (cache[cacheKey].expiry <= currentTime) {
+        delete cache[cacheKey];
+      }
+    }
+    // If still exceeding the size limit, clear the entire cache
+    if (Object.keys(cache).length >= MAX_CACHE_SIZE) {
+      for (const cacheKey in cache) {
+        delete cache[cacheKey];
+      }
+    }
+  }
 
   if (cache[key] && cache[key].expiry > currentTime) {
     return cache[key].data;
@@ -64,19 +80,24 @@ export const fetchPlatformData = async (
   return results;
 };
 
-export const platformData = async (req: Request, res: Response) => {
+export const platformData: RequestHandler = async (req, res): Promise<void> => {
   try {
-    // @ts-ignore
-    const { id } = req.user;
+    const id = req.user?.id;
+    if (!id) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
 
     const user = await User.findById(id);
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      res.status(404).json({ error: "User not found" });
+      return;
     }
 
     const { usernames } = user;
     if (!usernames) {
-      return res.status(403).json({ error: "Usernames not found" });
+      res.status(403).json({ error: "Usernames not found" });
+      return;
     }
 
     const filteredUsernames: Record<string, string | undefined> =
@@ -86,20 +107,51 @@ export const platformData = async (req: Request, res: Response) => {
 
     const results = await fetchPlatformData(filteredUsernames);
 
-    return res.json(results);
+    res.json(results);
   } catch (error: any) {
-    return res.status(500).json({
+    res.status(500).json({
       error: `Failed to fetch data: ${error.message}`,
     });
   }
 };
 
-export const fetchImages = async (req: Request, res: Response) => {
+// Allowlisted domains for image proxy to prevent SSRF attacks
+const ALLOWED_IMAGE_DOMAINS = [
+  "avatars.githubusercontent.com",
+  "github.githubassets.com",
+  "assets.leetcode.com",
+  "leetcode.com",
+  "media.geeksforgeeks.org",
+  "cdn.codechef.com",
+  "userpic.codeforces.org",
+  "userpic.codeforces.com",
+  "lh3.googleusercontent.com",
+  "gravatar.com",
+  "www.gravatar.com",
+  "i.imgur.com",
+];
+
+const isAllowedUrl = (url: string): boolean => {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return false;
+    return ALLOWED_IMAGE_DOMAINS.some(
+      (domain) => parsed.hostname === domain || parsed.hostname.endsWith(`.${domain}`)
+    );
+  } catch {
+    return false;
+  }
+};
+
+export const fetchImages: RequestHandler = async (req, res): Promise<void> => {
   const { urls } = req.body;
 
   try {
     const fetchImage = async (url: string) => {
-      const response = await axios.get(url, { responseType: "arraybuffer" });
+      if (!isAllowedUrl(url)) {
+        throw new Error(`Blocked: ${url} is not an allowed image domain`);
+      }
+      const response = await axios.get(url, { responseType: "arraybuffer", timeout: 5000 });
       const base64 = Buffer.from(response.data, "binary").toString("base64");
       const mimeType = response.headers["content-type"];
       return `data:${mimeType};base64,${base64}`;
@@ -108,8 +160,13 @@ export const fetchImages = async (req: Request, res: Response) => {
     const results = await Promise.all(
       Object.entries(urls).map(async ([key, url]) => {
         if (typeof url === "string") {
-          const data = await fetchImage(url);
-          return [key, data];
+          try {
+            const data = await fetchImage(url);
+            return [key, data];
+          } catch (err) {
+            console.warn(`Skipping blocked/failed URL for ${key}:`, (err as Error).message);
+            return [key, null];
+          }
         }
         return [key, null];
       }),

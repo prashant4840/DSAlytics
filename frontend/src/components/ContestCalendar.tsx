@@ -26,7 +26,7 @@ export const ContestCalendar: React.FC = () => {
         const data = await response.json();
         
         const filtered = data
-          .filter((contest: any) => {
+          .filter((contest: Contest) => {
             const siteName = (contest.site || "").toLowerCase();
             const start = new Date(contest.start_time);
             
@@ -40,7 +40,7 @@ export const ContestCalendar: React.FC = () => {
             return isTargetPlatform && start.getTime() > Date.now();
           })
           // Sort chronologically by start date
-          .sort((a: any, b: any) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
+          .sort((a: Contest, b: Contest) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
           // Limit to 5 upcoming contests
           .slice(0, 5);
 

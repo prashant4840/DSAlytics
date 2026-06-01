@@ -112,7 +112,6 @@ export const ShareCard = ({
             ref={cardRef}
             className="md:h-[40rem] sm:h-[43rem] h-[38rem] rounded-xl relative flex items-center justify-center">
             {React.createElement(backgrounds[selectedBackground]?.component)}
-            {React.createElement(backgrounds[selectedBackground].component)}
 
             <motion.div
               className="p-3 space-y-4 relative z-10"
@@ -129,7 +128,7 @@ export const ShareCard = ({
                 <div className="flex-1 md:text-left">
                   <h1
                     className={`text-2xl md:text-3xl text-center font-bold text-gray-900 ${
-                      user!.name.length! > 10 ? "text-sm md:text-lg" : ""
+                      (user?.name?.length ?? 0) > 10 ? "text-sm md:text-lg" : ""
                     }`}>
                     {user?.name}
                   </h1>

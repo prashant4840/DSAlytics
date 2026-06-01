@@ -9,7 +9,7 @@ export interface CodechefStats {
 
 export const fetchCodechefStats = async (username: string): Promise<CodechefStats> => {
   if (!username) {
-    return { rating: 0, stars: "1★", globalRank: 0, solved: 0 };
+    return { rating: 0, stars: "0★", globalRank: 0, solved: 0 };
   }
 
   try {
@@ -22,21 +22,21 @@ export const fetchCodechefStats = async (username: string): Promise<CodechefStat
 
     const html = response.data;
 
-    // Parse Rating
-    const ratingMatch = html.match(/<div class="rating-number">(\d+)<\/div>/);
-    const rating = ratingMatch ? parseInt(ratingMatch[1], 10) : 1200;
+    // Parse Rating (resilient to attributes, quotes, spaces)
+    const ratingMatch = html.match(/<div[^>]*class=["']rating-number["'][^>]*>\s*(\d+)\s*<\/div>/i);
+    const rating = ratingMatch ? parseInt(ratingMatch[1], 10) : 0;
 
-    // Parse Stars
-    const starsMatch = html.match(/<span class="rating">([1-7]★)<\/span>/);
-    const stars = starsMatch ? starsMatch[1] : "1★";
+    // Parse Stars (resilient to attributes, quotes, spaces)
+    const starsMatch = html.match(/<span[^>]*class=["']rating["'][^>]*>\s*([1-7]★?)\s*<\/span>/i);
+    const stars = starsMatch ? starsMatch[1] : "0★";
 
-    // Parse Global Rank
-    const rankMatch = html.match(/<a href="\/ratings\/all">\s*<span>(\d+)<\/span>\s*<\/a>/);
+    // Parse Global Rank (resilient to spaces, href quote styles)
+    const rankMatch = html.match(/href=["']\/ratings\/all["'][^>]*>\s*<span[^>]*>\s*(\d+)\s*<\/span>/i);
     const globalRank = rankMatch ? parseInt(rankMatch[1], 10) : 0;
 
-    // Parse Solved Problems
-    const solvedMatch = html.match(/Fully Solved \((\d+)\)/);
-    const solved = solvedMatch ? parseInt(solvedMatch[1], 10) : 25;
+    // Parse Solved Problems (resilient to casing and slight label variations)
+    const solvedMatch = html.match(/(?:Fully Solved|Solved Problems?)\s*\((\d+)\)/i);
+    const solved = solvedMatch ? parseInt(solvedMatch[1], 10) : 0;
 
     return {
       rating,
@@ -47,12 +47,12 @@ export const fetchCodechefStats = async (username: string): Promise<CodechefStat
   } catch (error: any) {
     console.error(`Error scraping CodeChef stats for ${username}:`, error.message);
     
-    // Graceful fallback defaults for CodeChef
+    // Return zeros on failure instead of fabricated data
     return {
-      rating: 1350,
-      stars: "1★",
-      globalRank: 124500,
-      solved: 32,
+      rating: 0,
+      stars: "0★",
+      globalRank: 0,
+      solved: 0,
     };
   }
 };

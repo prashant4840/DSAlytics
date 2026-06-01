@@ -3,11 +3,16 @@ import User from "../models/userModel";
 import { fetchPlatformData } from "./platformController";
 import jwt from "jsonwebtoken";
 
+const ALLOWED_PLATFORMS = ["leetcode", "gfg", "codeforces", "codechef", "github", "interviewbit"];
+
+const escapeRegex = (str: string): string =>
+  str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 export const previewPlatformData = async (req: Request, res: Response) => {
   try {
     const { userid } = req.params;
 
-    const user = await User.findById(userid).select("name email usernames pfp");
+    const user = await User.findById(userid).select("name usernames pfp");
     if (!user) {
       return res.status(404).json({ success: false, error: "User not found" });
     }
@@ -61,8 +66,8 @@ export const leaderboardController = async (req: Request, res: Response) => {
 
     if (token) {
       try {
-        // @ts-ignore
-        const { id } = jwt.verify(token, process.env.JWT_SECRET!);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
+        const id = decoded.id;
         const user = await User.findById(id).select("_id name pfp totalSolved skillScores college");
         if (user) {
           currentUser = {
@@ -83,11 +88,11 @@ export const leaderboardController = async (req: Request, res: Response) => {
     const query: any = {};
     query.totalSolved = { $exists: true };
 
-    if (college) {
-      query.college = { $regex: college, $options: "i" };
+    if (college && typeof college === "string") {
+      query.college = { $regex: escapeRegex(college), $options: "i" };
     }
 
-    if (platform) {
+    if (platform && typeof platform === "string" && ALLOWED_PLATFORMS.includes(platform)) {
       query[`usernames.${platform}`] = { $ne: "", $exists: true };
     }
 
@@ -116,17 +121,23 @@ export const leaderboardController = async (req: Request, res: Response) => {
 
     if (currentUser) {
       const targetUserId = currentUser.userId;
-      const allUsers = await User.find(query).sort(sortQuery);
-      const currentUserRank =
-        allUsers.findIndex(
-          (u) => u._id.toString() === targetUserId
-        ) + 1;
-      
-      const loggedInUser = allUsers.find(
-        (u) => u._id.toString() === targetUserId
-      );
+      const loggedInUser = await User.findById(targetUserId).select("_id name pfp totalSolved skillScores college");
 
-      if (loggedInUser && currentUserRank > 0) {
+      if (loggedInUser) {
+        // Compute rank efficiently via countDocuments instead of loading all users
+        const userSortValue = sortField === "skillScores.overall"
+          ? (loggedInUser.skillScores?.overall || 0)
+          : (loggedInUser.totalSolved || 0);
+
+        const rankQuery = {
+          ...query,
+          $or: [
+            { [sortField]: { $gt: userSortValue } },
+            { [sortField]: userSortValue, _id: { $lt: loggedInUser._id } },
+          ],
+        };
+        const usersAbove = await User.countDocuments(rankQuery);
+
         currentUser = {
           userId: loggedInUser._id.toString(),
           name: loggedInUser.name,
@@ -134,7 +145,7 @@ export const leaderboardController = async (req: Request, res: Response) => {
           totalSolved: loggedInUser.totalSolved || 0,
           overallScore: loggedInUser.skillScores?.overall || 0,
           college: loggedInUser.college || "",
-          rank: currentUserRank,
+          rank: usersAbove + 1,
         };
       } else {
         currentUser = null;

@@ -9,7 +9,7 @@ const AboutAndPrivacy: React.FC = () => {
         <section className="max-w-3xl sm:w-full my-20 mx-10">
           <h1 className="text-3xl font-bold mb-4">About</h1>
           <p className="text-lg leading-relaxed">
-            Welcome to DSA Stats! My mission is to bring all your coding and DSA
+            Welcome to DEVlytics! My mission is to bring all your coding and dev
             stats across multiple platforms into one beautifully designed
             interface. Stay organized and focused as you track your progress and
             share your achievements effortlessly.
@@ -34,7 +34,7 @@ const AboutAndPrivacy: React.FC = () => {
               className=" text-blue-500"
               href="mailto:prashantsharma4840@icloud.com"
               target="_blank">
-              me
+              me.
             </a>
           </p>
         </section>

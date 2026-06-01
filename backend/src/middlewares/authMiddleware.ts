@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 
-export const protect = (req: Request, res: Response, next: NextFunction) => {
+export const protect: RequestHandler = (req, res, next) => {
   const authHeader = req.headers["authorization"];
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     res.status(401).json({ message: "Unauthorized!", success: false });
@@ -9,11 +9,13 @@ export const protect = (req: Request, res: Response, next: NextFunction) => {
   }
   const token = authHeader.split(" ")[1];
 
-  if (!token) return res.status(401).json({ message: "Not authorized" });
+  if (!token) {
+    res.status(401).json({ message: "Not authorized" });
+    return;
+  }
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-    // @ts-ignore
-    req.user = decoded; // Attach user ID to request object
+    req.user = decoded as { id: string }; // Attach user ID to request object
     next();
   } catch (error) {
     res.status(401).json({ message: "Invalid token" });

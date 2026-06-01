@@ -36,7 +36,7 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
         count = Math.floor(dayFactor * maxVal) + 1;
         // Weekends have slightly lower commit frequencies
         const dayOfWeek = date.getDay();
-        if ((dayOfWeek === 0 || dayOfWeek === 6) && Math.random() > 0.5) {
+        if ((dayOfWeek === 0 || dayOfWeek === 6) && dayFactor > 0.5) {
           count = Math.max(0, count - 1);
         }
       }

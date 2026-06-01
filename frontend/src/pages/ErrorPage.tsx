@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const ErrorPage = () => {
   return (
     <div className="flex items-center justify-center h-screen">
@@ -7,11 +9,11 @@ const ErrorPage = () => {
         <p className="mt-2 text-xl text-gray-400">
           Oops! The page you're looking for doesn't exist.
         </p>
-        <a
-          href="/"
+        <Link
+          to="/"
           className="inline-block mt-6 px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-500 transition">
           Go Back Home
-        </a>
+        </Link>
       </div>
     </div>
   );

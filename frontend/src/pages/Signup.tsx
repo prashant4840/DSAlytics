@@ -62,7 +62,7 @@ const Signup = () => {
               Create an account
             </h2>
             <p className="mt-2 text-gray-600">
-              Start tracking your DSA progress
+              Start tracking your dev career
             </p>
           </div>
 

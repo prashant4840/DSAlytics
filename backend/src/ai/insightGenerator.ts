@@ -82,7 +82,7 @@ export const generateInsights = async (
   if (geminiApiKey) {
     try {
       const aiResponse = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
         {
           contents: [
             {
@@ -99,7 +99,8 @@ export const generateInsights = async (
         },
         {
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "x-goog-api-key": geminiApiKey,
           },
           timeout: 10000
         }

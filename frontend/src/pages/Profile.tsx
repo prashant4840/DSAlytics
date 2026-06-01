@@ -326,7 +326,7 @@ export const Profile = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div>
             <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-              DEV Analytics Cockpit
+              DEVlytics Cockpit
             </h1>
             <p className="text-gray-600 text-sm">
               Manage connected coding accounts and view your AI career intelligence report.

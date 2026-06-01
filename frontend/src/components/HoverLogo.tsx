@@ -67,7 +67,7 @@ const HoverLogo = () => {
 
       {/* CodeChef Logo */}
       <motion.img
-        src="/logos/codeforces.webp"
+        src="/logos/codechef.png"
         alt="CodeChef"
         className="hidden blur-[1.5px] lg:block w-10 h-10 absolute bottom-40 -left-10 drop-shadow-[0_16px_24px_rgba(139,87,42,0.35)]"
         style={{

@@ -1,3 +1,5 @@
+import React from "react";
+
 export const Modal = ({
   isOpen,
   onClose,
@@ -11,7 +13,7 @@ export const Modal = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+      <div className="relative bg-white rounded-lg p-6 w-full max-w-md mx-4">
         {children}
         <button
           onClick={onClose}

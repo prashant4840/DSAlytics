@@ -16,19 +16,19 @@ import { protect } from "../middlewares/authMiddleware";
 
 const router = express.Router();
 
-router.post("/register", registerUser as any);
-router.post("/login", loginUser as any);
+router.post("/register", registerUser);
+router.post("/login", loginUser);
 
-router.put("/usernames", protect as any, updateUsernames as any);
-router.put("/update", protect as any, updateUserDetails as any);
-router.put("/pfp", protect as any, setUserAvatar as any);
-router.put("/totalsolved", protect as any, setTotalSolved as any);
+router.put("/usernames", protect, updateUsernames);
+router.put("/update", protect, updateUserDetails);
+router.put("/pfp", protect, setUserAvatar);
+router.put("/totalsolved", protect, setTotalSolved);
 
-router.get("/verify", protect as any, verify as any);
-router.get("/id", protect as any, userId as any);
-router.get("/analytics", protect as any, getAnalytics as any);
+router.get("/verify", protect, verify);
+router.get("/id", protect, userId);
+router.get("/analytics", protect, getAnalytics);
 
-router.post("/sync", protect as any, syncAllStats as any);
+router.post("/sync", protect, syncAllStats);
 
-router.delete("/usernames", protect as any, deleteUser as any);
+router.delete("/usernames", protect, deleteUser);
 export default router;

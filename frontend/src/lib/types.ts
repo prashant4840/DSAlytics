@@ -1,4 +1,5 @@
 export interface User {
+  _id?: string;
   name: string;
   email: string;
   password: string;
@@ -54,32 +55,32 @@ export const PLATFORMS: Platform[] = [
   {
     id: "leetcode",
     name: "LeetCode",
-    logo: "/leetcode.webp",
+    logo: "leetcode.webp",
   },
   {
     id: "gfg",
     name: "GeeksForGeeks",
-    logo: "/gfg.png",
+    logo: "gfg.png",
   },
   {
     id: "interviewbit",
     name: "InterviewBit",
-    logo: "/interviewbit.png",
+    logo: "interviewbit.png",
   },
   {
     id: "codeforces",
     name: "CodeForces",
-    logo: "/codeforces.webp",
+    logo: "codeforces.webp",
   },
   {
     id: "github",
     name: "GitHub",
-    logo: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+    logo: "github.png",
   },
   {
     id: "codechef",
     name: "CodeChef",
-    logo: "/logos/codechef.png",
+    logo: "codechef.png",
   },
 ];
 

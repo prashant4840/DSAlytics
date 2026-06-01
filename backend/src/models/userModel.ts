@@ -51,4 +51,11 @@ const userSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model("User", userSchema);
+
+// Performance indexes for leaderboard sorting and filtering
+userSchema.index({ totalSolved: -1 });
+userSchema.index({ "skillScores.overall": -1 });
+userSchema.index({ college: 1 });
+
 export default User;
+

@@ -1,44 +1,33 @@
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
-import { useEffect, useState } from "react";
-import axiosFetch from "../lib/axiosFetch";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Menu, X, Sun, Moon } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useUserContext } from "../contexts/Context";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [rateLimitExceeded, setRateLimitExceeded] = useState<boolean>(false);
+  const { user, logout } = useUserContext();
   const location = useLocation();
-  const token = localStorage.getItem("token");
+  const navigate = useNavigate();
+
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) return savedTheme === "dark";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  });
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [isDarkMode]);
 
   const currentUrl = location.pathname;
   const isVisible = currentUrl === "/login" || currentUrl === "/signup";
   const textDark = /^\/preview\/[^/]+$/.test(currentUrl);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!token || rateLimitExceeded) return; // Avoid infinite requests
-
-      try {
-        const { data } = await axiosFetch.get("/api/user/id", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (!data.success) throw new Error("Not authorized");
-        setUserId(data.id);
-      } catch (error) {
-        const err = error as { response?: { status: number; data?: { message?: string } } };
-        if (err.response?.status === 429) {
-          console.error("Rate limit exceeded:", err.response.data?.message);
-          setRateLimitExceeded(true);
-        } else {
-          console.error("Authentication or data fetching error");
-        }
-        setUserId(null);
-      }
-    };
-
-    fetchData();
-  }, [token, rateLimitExceeded]);
 
   const getLinkClasses = (path: string) => {
     if (textDark) {
@@ -53,8 +42,8 @@ export const Navbar = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.replace("/");
+    logout();
+    navigate("/");
   };
 
   return (
@@ -79,7 +68,7 @@ export const Navbar = () => {
               className={`font-bold ${
                 textDark ? "dark:text-white text-black" : "text-black"
               } text-xl`}>
-              DEV Analytics
+              DEVlytics
             </span>
           </Link>
           <div className="hidden md:flex space-x-8 text-lg">
@@ -87,7 +76,7 @@ export const Navbar = () => {
               Profile
             </Link>
             <Link
-              to={`/preview/${userId}`}
+              to={`/preview/${user?._id || "null"}`}
               className={getLinkClasses("/preview")}>
               Preview
             </Link>
@@ -95,19 +84,26 @@ export const Navbar = () => {
               Leaderboard
             </Link>
             {!isVisible &&
-              (token ? (
+              (user ? (
                 <button
                   onClick={handleLogout}
-                  className="text-gray-500 text-xl border border-gray-500 px-3 rounded-lg hover:text-indigo-600 transition-colors flex">
+                  className="text-gray-500 text-xl border border-gray-500 px-3 rounded-lg hover:text-indigo-600 transition-colors flex cursor-pointer">
                   Log Out
                 </button>
               ) : (
                 <Link to={"/login"}>
-                  <div className="text-gray-500 text-xl border border-gray-500 line px-3 rounded-lg hover:text-indigo-600 transition-colors flex">
+                  <div className="text-gray-500 text-xl border border-gray-500 line px-3 rounded-lg hover:text-indigo-600 transition-colors flex cursor-pointer">
                     Log in
                   </div>
                 </Link>
               ))}
+            <button
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className="p-2 rounded-lg bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors flex items-center justify-center cursor-pointer"
+              title="Toggle Theme"
+            >
+              {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
           </div>
           <button
             className={`md:hidden ${
@@ -127,7 +123,7 @@ export const Navbar = () => {
               Profile
             </Link>
             <Link
-              to={`/preview/${userId}`}
+              to={`/preview/${user?._id || "null"}`}
               className={getLinkClasses("/preview")}>
               Preview
             </Link>
@@ -135,19 +131,28 @@ export const Navbar = () => {
               Leaderboard
             </Link>
             {!isVisible &&
-              (token ? (
+              (user ? (
                 <button
                   onClick={handleLogout}
-                  className=" text-gray-500 text-xl rounded-lg transition-colors flex">
+                  className=" text-gray-500 text-xl rounded-lg transition-colors flex cursor-pointer">
                   Log Out
                 </button>
               ) : (
                 <Link to={"/login"}>
-                  <div className=" text-gray-500 text-xl mt-2 underline rounded-lg transition-colors flex">
+                  <div className=" text-gray-500 text-xl mt-2 underline rounded-lg transition-colors flex cursor-pointer">
                     Log in
                   </div>
                 </Link>
               ))}
+            <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-zinc-800">
+              <span className="text-gray-500 text-sm">Theme</span>
+              <button
+                onClick={() => setIsDarkMode(!isDarkMode)}
+                className="p-2 rounded-lg bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors flex items-center justify-center cursor-pointer"
+              >
+                {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
+            </div>
           </div>
         )}
       </div>

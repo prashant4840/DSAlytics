@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, RequestHandler } from "express";
 import bcrypt from "bcrypt";
 import User from "../models/userModel";
 import generateToken from "../utils/generateTokens";
@@ -9,60 +9,88 @@ import { calculateSkillScores } from "../analytics/scoringEngine";
 import { generateInsights } from "../ai/insightGenerator";
 import { AxiosError } from "axios";
 
-export const registerUser = async (req: Request, res: Response) => {
+export const registerUser: RequestHandler = async (req, res): Promise<void> => {
   const { name, email, password } = req.body;
+
+  if (!name || typeof name !== "string" || name.trim().length < 2) {
+    res.status(400).json({ message: "Name must be at least 2 characters long" });
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || !emailRegex.test(email)) {
+    res.status(400).json({ message: "Please provide a valid email address" });
+    return;
+  }
+
+  if (!password || typeof password !== "string" || password.length < 6) {
+    res.status(400).json({ message: "Password must be at least 6 characters long" });
+    return;
+  }
 
   try {
     const existingUser = await User.findOne({ email });
-    if (existingUser)
-      return res.status(400).json({ message: "User already exists" });
+    if (existingUser) {
+      res.status(400).json({ message: "User already exists" });
+      return;
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({ name, email, password: hashedPassword });
 
-    return res.status(201).json({ token: generateToken(user.id) });
+    res.status(201).json({ token: generateToken(user.id) });
   } catch (error) {
-    return res.status(500).json({ message: "Error creating user" });
+    res.status(500).json({ message: "Error creating user" });
   }
 };
 
-export const loginUser = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+export const loginUser: RequestHandler = async (
+  req,
+  res
+): Promise<void> => {
   const { email, password } = req.body;
 
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
-      return res.status(400).json({ message: "Invalid credentials" });
+    if (!isMatch) {
+      res.status(400).json({ message: "Invalid credentials" });
+      return;
+    }
 
-    return res.status(200).json({ token: generateToken(user.id) });
+    res.status(200).json({ token: generateToken(user.id) });
   } catch (error) {
-    return res.status(500).json({ message: "Error logging in user" });
+    res.status(500).json({ message: "Error logging in user" });
   }
 };
 
-export const updateUsernames = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
-  // @ts-ignore
-  const { id } = req.user; // Extracted from auth middleware
+export const updateUsernames: RequestHandler = async (
+  req,
+  res
+): Promise<void> => {
+  const id = req.user?.id;
+  if (!id) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
   const updates = req.body; // Contains only provided usernames
 
   try {
     const user = await User.findById(id);
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "User not found" });
+      return;
     }
     const verification = await verifyPlatformData(updates);
 
     if (!verification.success) {
-      return res.status(400).json({ message: verification.error });
+      res.status(400).json({ message: verification.error });
+      return;
     }
 
     const updatedUsernames = { ...user.usernames, ...updates };
@@ -71,134 +99,145 @@ export const updateUsernames = async (
     user.usernames = updatedUsernames;
     await user.save();
 
-    return res.json(user);
+    res.json(user);
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Error updating usernames" });
+    res.status(500).json({ message: "Error updating usernames" });
   }
 };
 
-export const setTotalSolved = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
-  // @ts-ignore
-  const { id } = req.user as { id: string };
-  const { totalSolved } = req.body;
-
-  try {
-    const user = await User.findById(id);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    user.totalSolved = totalSolved;
-
-    await user.save();
-
-    return res.json({ success: true });
-  } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Error setting total problems solved" });
-  }
+export const setTotalSolved: RequestHandler = async (
+  req,
+  res
+): Promise<void> => {
+  res.status(403).json({
+    message: "totalSolved is computed automatically on sync and cannot be set directly",
+  });
 };
 
-export const verify = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
-  // @ts-ignore
-  const { id } = req.user as { id: string }; // Extracted from auth middleware
+export const verify: RequestHandler = async (
+  req,
+  res
+): Promise<void> => {
+  const id = req.user?.id;
+  if (!id) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
 
   try {
     const user = await User.findById(id).select("name email usernames pfp");
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "User not found" });
+      return;
     }
-    return res.json({ success: true, user });
+    res.json({ success: true, user });
   } catch (error) {
-    return res.status(500).json({ message: "Error verifying user" });
+    res.status(500).json({ message: "Error verifying user" });
   }
 };
 
-export const userId = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
-  // @ts-ignore
-  const { id } = req.user as { id: string };
+export const userId: RequestHandler = async (
+  req,
+  res
+): Promise<void> => {
+  const id = req.user?.id;
+  if (!id) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
 
   try {
     const user = await User.findById(id);
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "User not found" });
+      return;
     }
-    return res.json({ success: true, id });
+    res.json({ success: true, id });
   } catch (error) {
-    return res.status(500).json({ message: "Error verifying user" });
+    res.status(500).json({ message: "Error verifying user" });
   }
 };
 
-export const setUserAvatar = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
-  // @ts-ignore
-  const { id } = req.user as { id: string }; // Extracted from auth middleware
+export const setUserAvatar: RequestHandler = async (
+  req,
+  res
+): Promise<void> => {
+  const id = req.user?.id;
+  if (!id) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
   const { avatarUrl } = req.body;
 
   try {
     const user = await User.findById(id);
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "User not found" });
+      return;
     }
     user.pfp = avatarUrl;
 
     await user.save();
 
-    return res.json(user);
+    res.json(user);
   } catch (error) {
-    return res.status(500).json({ message: "Error setting user avatar" });
+    res.status(500).json({ message: "Error setting user avatar" });
   }
 };
 
-export const updateUserDetails = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
-  // @ts-ignore
-  const { id } = req.user as { id: string }; // Extracted from auth middleware
+export const updateUserDetails: RequestHandler = async (
+  req,
+  res
+): Promise<void> => {
+  const id = req.user?.id;
+  if (!id) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
   const { name, email, college } = req.body;
 
   try {
     const user = await User.findById(id);
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "User not found" });
+      return;
     }
 
     if (name) user.name = name;
-    if (email) user.email = email;
+    if (email && email !== user.email) {
+      const emailExists = await User.findOne({ email });
+      if (emailExists) {
+        res.status(400).json({ message: "Email is already in use" });
+        return;
+      }
+      user.email = email;
+    }
     if (college !== undefined) user.college = college;
 
     await user.save();
 
-    return res.json(user);
+    res.json(user);
   } catch (error) {
-    return res.status(500).json({ message: "Error updating user details" });
+    res.status(500).json({ message: "Error updating user details" });
   }
 };
 
-export const deleteUser = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+export const deleteUser: RequestHandler = async (
+  req,
+  res
+): Promise<void> => {
   try {
-    // @ts-ignore
-    const { id } = req.user as { id: string }; // Extracted from auth middleware
+    const id = req.user?.id;
+    if (!id) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
     const { platformId } = req.body;
 
     if (!platformId) {
-      return res.status(400).json({ message: "Platform ID is required" });
+      res.status(400).json({ message: "Platform ID is required" });
+      return;
     }
 
     // Find the user and update the specific platform's username to null
@@ -209,24 +248,29 @@ export const deleteUser = async (
     );
 
     if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "User not found" });
+      return;
     }
 
-    return res.status(200).json(updatedUser);
+    res.status(200).json(updatedUser);
   } catch (error: any) {
     console.error("Error deleting username:", error.message);
-    return res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
-export const syncAllStats = async (req: Request, res: Response) => {
-  // @ts-ignore
-  const { id } = req.user as { id: string };
+export const syncAllStats: RequestHandler = async (req, res): Promise<void> => {
+  const id = req.user?.id;
+  if (!id) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
 
   try {
     const user = await User.findById(id);
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "User not found" });
+      return;
     }
 
     // Smart Caching Check (15 minutes threshold unless forced)
@@ -236,12 +280,13 @@ export const syncAllStats = async (req: Request, res: Response) => {
     const hasSyncedRecently = lastSyncedTime && (Date.now() - lastSyncedTime < cooldownPeriod);
 
     if (hasSyncedRecently && !force) {
-      return res.json({
+      res.json({
         success: true,
         isCached: true,
         message: "Data loaded from cache. You can sync again in 15 minutes.",
         user,
       });
+      return;
     }
 
     const { usernames } = user;
@@ -306,27 +351,31 @@ export const syncAllStats = async (req: Request, res: Response) => {
     user.lastSyncedAt = new Date();
     await user.save();
 
-    return res.json({
+    res.json({
       success: true,
       user,
     });
   } catch (error: any) {
     console.error("Error syncing platform stats:", error);
-    return res.status(500).json({ message: "Error syncing stats: " + error.message });
+    res.status(500).json({ message: "Error syncing stats: " + error.message });
   }
 };
 
-export const getAnalytics = async (req: Request, res: Response) => {
-  // @ts-ignore
-  const { id } = req.user as { id: string };
+export const getAnalytics: RequestHandler = async (req, res): Promise<void> => {
+  const id = req.user?.id;
+  if (!id) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
 
   try {
     const user = await User.findById(id).select("skillScores weaknesses recommendations githubStats totalSolved");
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "User not found" });
+      return;
     }
 
-    return res.json({
+    res.json({
       success: true,
       analytics: {
         skillScores: user.skillScores,
@@ -337,6 +386,6 @@ export const getAnalytics = async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    return res.status(500).json({ message: "Error fetching analytics" });
+    res.status(500).json({ message: "Error fetching analytics" });
   }
 };

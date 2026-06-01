@@ -47,7 +47,7 @@ export const verifyGithub = async (username: string) => {
   try {
     const res = await axios.get(`https://api.github.com/users/${username}`, {
       headers: {
-        "User-Agent": "DSAlytics-App",
+        "User-Agent": "DEVlytics-App",
       },
     });
     return {

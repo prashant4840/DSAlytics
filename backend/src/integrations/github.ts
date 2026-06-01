@@ -16,7 +16,7 @@ export const fetchGithubStats = async (username: string): Promise<GithubStats> =
     // 1. Fetch main user profile
     const profileResponse = await axios.get(`https://api.github.com/users/${username}`, {
       headers: {
-        "User-Agent": "DSAlytics-App",
+        "User-Agent": "DEVlytics-App",
       },
     });
 
@@ -25,7 +25,7 @@ export const fetchGithubStats = async (username: string): Promise<GithubStats> =
     // 2. Fetch public repositories (capped at 100 for performance/rate limits)
     const reposResponse = await axios.get(`https://api.github.com/users/${username}/repos?per_page=100`, {
       headers: {
-        "User-Agent": "DSAlytics-App",
+        "User-Agent": "DEVlytics-App",
       },
     });
 
@@ -42,7 +42,7 @@ export const fetchGithubStats = async (username: string): Promise<GithubStats> =
     }
 
     // Estimate commit count based on public repos and active stars
-    // A realistic formula for public profiles where full commit history scraping is heavily rate-limited
+    // Note: This is an estimate — full commit history scraping is heavily rate-limited by GitHub
     const estimatedCommits = (publicRepos * 12) + (stars * 5) + 37;
 
     return {
@@ -54,12 +54,12 @@ export const fetchGithubStats = async (username: string): Promise<GithubStats> =
   } catch (error: any) {
     console.error(`Error fetching GitHub stats for ${username}:`, error.message);
     
-    // Graceful fallback for rate limits or private connections
+    // Return zeros on failure instead of fabricated data
     return {
-      repos: 8,
-      commits: 124,
-      stars: 4,
-      openSource: 2,
+      repos: 0,
+      commits: 0,
+      stars: 0,
+      openSource: 0,
     };
   }
 };

@@ -4,7 +4,7 @@ import { Download, Link, Share2Icon } from "lucide-react";
 import { motion } from "framer-motion";
 import { ShareCard } from "../components/ShareCard";
 import { User, UserStats } from "../lib/types";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axiosFetch from "../lib/axiosFetch";
 import LoadingPage from "./Loading";
 import Toast from "../components/ui/Toast";
@@ -21,6 +21,7 @@ const PreviewPage = () => {
   const [isError, setIsError] = useState<string | null>(null);
 
   const id = useParams().userid;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,7 +48,7 @@ const PreviewPage = () => {
         const err = error as { response?: { status: number; data?: { message?: string } } };
         if (err.response?.status === 429) {
           console.error("Rate limit exceeded:", err.response.data?.message);
-          window.location.href = "/";
+          navigate("/");
         } else {
           console.error("Authentication or data fetching error:", error);
           setIsError("Authentication Error");
@@ -89,27 +90,38 @@ const PreviewPage = () => {
   const handleShare = async () => {
     setIsError(null);
     try {
-      await navigator.share({
-        title: `${user?.name}'s DSA Profile`,
-        text: "Check out my DSA profile!",
-        url: window.location.href,
-      });
+      if (navigator.share) {
+        await navigator.share({
+          title: `${user?.name}'s DEVlytics Profile`,
+          text: "Check out my DEVlytics profile!",
+          url: window.location.href,
+        });
+      } else {
+        // Fallback for browsers without Web Share API
+        await navigator.clipboard.writeText(window.location.href);
+        setIsCopied(true);
+      }
     } catch (error) {
       console.error("Error sharing:", error);
       setIsError("Error sharing");
     }
   };
 
-  const handleCopyLink = () => {
-    setIsCopied(true);
-    navigator.clipboard.writeText(window.location.href);
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setIsCopied(true);
+    } catch {
+      setIsError("Failed to copy link");
+    }
   };
+
   useEffect(() => {
-    setInterval(() => {
-      if (!isCopied) {
-        setIsCopied(false);
-      }
-    }, 5000);
+    if (!isCopied) return;
+    const timer = setTimeout(() => {
+      setIsCopied(false);
+    }, 3000);
+    return () => clearTimeout(timer);
   }, [isCopied]);
 
   const numUsernames = Object.values(user?.usernames || {}).filter(

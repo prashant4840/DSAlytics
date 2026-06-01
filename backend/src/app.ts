@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import connectDB from "./config/db";
 import userRoutes from "./routes/userRoutes";
 import platformRoutes from "./routes/platformRoutes";
 import rateLimit from "express-rate-limit";
@@ -12,16 +11,18 @@ import {
 } from "./controllers/publicControllers";
 
 dotenv.config();
-connectDB();
+
+// Validate critical env vars at startup
+if (!process.env.JWT_SECRET) {
+  console.error("FATAL: JWT_SECRET environment variable is not set.");
+  process.exit(1);
+}
 
 const app = express();
 
 app.use(
   cors({
     origin: [
-      "https://dsastats.zreo.xyz",
-      "https://dsastats.fun",
-      "https://dsastat.vercel.app",
       "http://localhost:5173",
       "http://localhost:3000",
       "http://localhost:5000"
@@ -33,21 +34,12 @@ app.use(
 app.use(express.json());
 
 const limiter = rateLimit({
-  windowMs: 1 * 30 * 1000, // 1 minutes
-  max: 500, // limit each IP to 100 requests per windowMs
-  message: "Too many requests from this IP, please try again after 15 minutes",
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 100, // limit each IP to 100 requests per minute
+  message: "Too many requests from this IP, please try again after 1 minute",
 });
 
 app.use(limiter);
-
-// let requestCounter = 0;
-
-// // Middleware to log all incoming requests
-// app.use((req, res, next) => {
-//   requestCounter++;
-//   console.log(`Request #${requestCounter} - ${req.method} ${req.originalUrl}`);
-//   next();
-// });
 
 app.get("/", (_req, res) => {
   res.send("DEVlytics API");

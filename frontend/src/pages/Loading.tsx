@@ -42,12 +42,12 @@ const LoadingPage = () => {
               key={i}
               className="absolute bg-indigo-500 opacity-5 rounded-full animate-float"
               style={{
-                width: `${Math.random() * 100 + 50}px`,
-                height: `${Math.random() * 100 + 50}px`,
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 2}s`,
-                animationDuration: `${Math.random() * 3 + 2}s`,
+                width: `${60 + i * 20}px`,
+                height: `${60 + i * 20}px`,
+                left: `${10 + i * 15}%`,
+                top: `${5 + i * 16}%`,
+                animationDelay: `${i * 0.4}s`,
+                animationDuration: `${3 + i * 0.5}s`,
               }}
             />
           ))}
@@ -61,36 +61,5 @@ const LoadingPage = () => {
     </div>
   );
 };
-
-// Add custom animation to tailwind
-const style = document.createElement("style");
-style.textContent = `
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0) scale(1);
-    }
-    50% {
-      transform: translateY(-20px) scale(1.05);
-    }
-  }
-  @keyframes progress {
-    0% {
-      transform: scaleX(0);
-    }
-    50% {
-      transform: scaleX(0.7);
-    }
-    100% {
-      transform: scaleX(1);
-    }
-  }
-  .animate-float {
-    animation: float 3s ease-in-out infinite;
-  }
-  .animate-progress {
-    animation: progress 2s ease-in-out infinite;
-  }
-`;
-document.head.appendChild(style);
 
 export default LoadingPage;
