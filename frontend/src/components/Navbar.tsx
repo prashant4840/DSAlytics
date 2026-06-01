@@ -79,7 +79,7 @@ export const Navbar = () => {
               className={`font-bold ${
                 textDark ? "dark:text-white text-black" : "text-black"
               } text-xl`}>
-              DSA Stats
+              DEV Analytics
             </span>
           </Link>
           <div className="hidden md:flex space-x-8 text-lg">

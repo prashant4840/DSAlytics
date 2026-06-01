@@ -42,24 +42,24 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900">
-              Everything you need to track your DSA progress
+              Unleash Your Potential with AI Career Intelligence
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <FeatureCard
               icon={MdLeaderboard}
-              title="Beautiful shareable cards"
-              description="Create beautiful cards to showcase your progress. Share them on social media or with potential employers."
+              title="Skill Radar & Scoring"
+              description="A weighted percentile radar mapping your DSA, Consistency, Development, and Contest performance."
             />
             <FeatureCard
               icon={BarChart2}
-              title="Leaderboards"
-              description="Compete with friends and other users on the platform. See where you stand and get motivated to improve."
+              title="Weakness Detection"
+              description="Color-coded risk indicators exposing documentation gaps, low project depth, or contest avoidance in real-time."
             />
             <FeatureCard
               icon={GiProgression}
-              title="all your progress in one place"
-              description="Track your progress on multiple platforms in one place. No need to switch between multiple tabs. or share multiple links of different platforms."
+              title="Personalized Roadmaps"
+              description="Customized action roadmaps with handpicked learning resources generated directly based on your stats gaps."
             />
           </div>
         </div>

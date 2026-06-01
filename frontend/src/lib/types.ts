@@ -7,9 +7,39 @@ export interface User {
     gfg?: string;
     interviewbit?: string;
     codeforces?: string;
+    github?: string;
+    codechef?: string;
   };
   pfp?: string;
   totalSolved?: number;
+  githubStats?: {
+    repos: number;
+    commits: number;
+    stars: number;
+    openSource: number;
+  };
+  skillScores?: {
+    overall: number;
+    dsa: number;
+    development: number;
+    consistency: number;
+    problemSolving: number;
+    projectQuality: number;
+    contestPerformance: number;
+    openSource: number;
+  };
+  weaknesses?: Array<{
+    title: string;
+    category: string;
+    level: "High" | "Medium" | "Low";
+    description: string;
+  }>;
+  recommendations?: Array<{
+    title: string;
+    category: string;
+    description: string;
+    actionUrl: string;
+  }>;
 }
 
 export interface Platform {
@@ -38,6 +68,16 @@ export const PLATFORMS: Platform[] = [
     id: "codeforces",
     name: "CodeForces",
     logo: "/codeforces.webp",
+  },
+  {
+    id: "github",
+    name: "GitHub",
+    logo: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+  },
+  {
+    id: "codechef",
+    name: "CodeChef",
+    logo: "/logos/codechef.png",
   },
 ];
 

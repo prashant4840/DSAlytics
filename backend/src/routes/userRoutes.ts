@@ -9,6 +9,8 @@ import {
   updateUserDetails,
   userId,
   setTotalSolved,
+  syncAllStats,
+  getAnalytics,
 } from "../controllers/userController";
 import { protect } from "../middlewares/authMiddleware";
 
@@ -24,6 +26,9 @@ router.put("/totalsolved", protect as any, setTotalSolved as any);
 
 router.get("/verify", protect as any, verify as any);
 router.get("/id", protect as any, userId as any);
+router.get("/analytics", protect as any, getAnalytics as any);
+
+router.post("/sync", protect as any, syncAllStats as any);
 
 router.delete("/usernames", protect as any, deleteUser as any);
 export default router;

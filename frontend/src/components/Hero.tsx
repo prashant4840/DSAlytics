@@ -28,13 +28,12 @@ export const Hero = () => {
             ease: [0.4, 0.0, 0.5, 1],
           }}
           className="text-5xl pb-5 px-4 md:text-4xl lg:text-6xl font-bold text-black  max-w-4xl leading-relaxed lg:leading-snug text-center mx-auto ">
-          Share all your DSA stats in{" "}
-          <AnimatedHighlight>one place</AnimatedHighlight>
+          AI-Powered Career Intelligence in{" "}
+          <AnimatedHighlight>one cockpit</AnimatedHighlight>
         </motion.h1>
 
         <div className="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl mx-auto animate-slide-down">
-          Share and track your progress across LeetCode, GFG, Codeforces and
-          interviewBit. showcase your coding journey in one place.{" "}
+          Unified skill radar, consistency tracking, weakness detection, and custom roadmaps compiled from GitHub, LeetCode, CodeForces, CodeChef and more.{" "}
           <span className="bg-gradient-to-r from-purple-400 to-indigo-600 bg-clip-text text-transparent">
             Get started now!
           </span>

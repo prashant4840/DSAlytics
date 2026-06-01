@@ -26,6 +26,12 @@ export const verifyPlatformData = async (updates: TVerificationRequest) => {
     case "interviewbit":
       data = await interviewbitData(username);
       break;
+    case "github":
+      data = await verifyGithub(username);
+      break;
+    case "codechef":
+      data = await verifyCodechef(username);
+      break;
     default:
       return { success: false, error: "Invalid platform" };
   }
@@ -34,6 +40,44 @@ export const verifyPlatformData = async (updates: TVerificationRequest) => {
     return { success: true, data };
   } else {
     return { success: false, error: `${platform} data not found` };
+  }
+};
+
+export const verifyGithub = async (username: string) => {
+  try {
+    const res = await axios.get(`https://api.github.com/users/${username}`, {
+      headers: {
+        "User-Agent": "DSAlytics-App",
+      },
+    });
+    return {
+      avatar: res.data.avatar_url,
+      totalProblemsSolved: 0,
+    };
+  } catch (error) {
+    console.error("Error in verifying GitHub username:", error);
+    return null;
+  }
+};
+
+export const verifyCodechef = async (username: string) => {
+  try {
+    const res = await axios.get(`https://www.codechef.com/users/${username}`, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+      },
+      timeout: 5000,
+    });
+    if (res.data.includes("rating-number") || res.data.includes("rating-header")) {
+      return {
+        avatar: "/logos/codechef.png",
+        totalProblemsSolved: 0,
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error("Error in verifying CodeChef username:", error);
+    return null;
   }
 };
 
