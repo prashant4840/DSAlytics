@@ -5,6 +5,8 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   pfp: { type: String },
+  college: { type: String, default: "" },
+  lastSyncedAt: { type: Date },
   usernames: {
     leetcode: { type: String, default: "" },
     gfg: { type: String, default: "" },

@@ -2,6 +2,8 @@ export interface User {
   name: string;
   email: string;
   password: string;
+  college?: string;
+  lastSyncedAt?: string;
   usernames: {
     leetcode?: string;
     gfg?: string;
@@ -103,6 +105,8 @@ export interface LeaderboardUser {
   name: string;
   pfp: string;
   totalSolved: number;
+  overallScore?: number;
+  college?: string;
   rank: number;
 }
 

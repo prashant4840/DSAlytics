@@ -50,7 +50,7 @@ app.use(limiter);
 // });
 
 app.get("/", (_req, res) => {
-  res.send("DSAStats API");
+  res.send("DEVlytics API");
 });
 
 app.use("/api/user", userRoutes);

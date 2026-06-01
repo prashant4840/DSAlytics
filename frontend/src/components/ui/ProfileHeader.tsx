@@ -9,6 +9,7 @@ interface ProfileHeaderProps {
   onUserUpdate: (data: {
     name: string;
     email: string;
+    college?: string;
   }) => Promise<{ success: boolean }>;
   loadingPlatforms: Record<string, boolean>;
   totalProblemsSolved: number;
@@ -29,6 +30,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const [editForm, setEditForm] = useState({
     name: user?.name || "",
     email: user?.email || "",
+    college: user?.college || "",
   });
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,6 +44,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     setEditForm({
       name: user?.name || "",
       email: user?.email || "",
+      college: user?.college || "",
     });
   }, [user]);
 
@@ -62,7 +65,11 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (user?.name === editForm.name && user?.email === editForm.email) {
+    if (
+      user?.name === editForm.name &&
+      user?.email === editForm.email &&
+      (user?.college || "") === editForm.college
+    ) {
       setError("Changes are same as current profile");
       return;
     }
@@ -103,9 +110,13 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             </button>
             <div className="space-y-1">
               <h2 className="text-2xl font-bold text-gray-800">{user?.name}</h2>
-              <div className="flex items-center space-x-2 text-gray-600">
-                <span className="text-xl">📧</span>
-                <span>{user?.email}</span>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-y-1 gap-x-4 text-gray-600 text-sm">
+                <span className="flex items-center gap-1">📧 {user?.email}</span>
+                {user?.college && (
+                  <span className="flex items-center gap-1 font-semibold bg-indigo-50 border border-indigo-200 text-indigo-750 px-2 py-0.5 rounded-full text-xs">
+                    🏫 {user.college}
+                  </span>
+                )}
               </div>
             </div>
             <button
@@ -148,6 +159,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           setEditForm({
             name: user?.name || "",
             email: user?.email || "",
+            college: user?.college || "",
           });
         }}>
         <div className="p-6">
@@ -202,6 +214,20 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 placeholder="Enter your email"
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                College / University
+              </label>
+              <input
+                type="text"
+                value={editForm.college}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, college: e.target.value })
+                }
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter your college or university"
+              />
+            </div>
             {error && <p className="text-red-500 text-sm">{error}</p>}
             <div className="flex space-x-2">
               <button
@@ -218,6 +244,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                   setEditForm({
                     name: user?.name || "",
                     email: user?.email || "",
+                    college: user?.college || "",
                   });
                 }}
                 className="flex-1 border border-gray-300 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors">

@@ -168,7 +168,7 @@ export const updateUserDetails = async (
 ): Promise<Response> => {
   // @ts-ignore
   const { id } = req.user as { id: string }; // Extracted from auth middleware
-  const { name, email } = req.body;
+  const { name, email, college } = req.body;
 
   try {
     const user = await User.findById(id);
@@ -178,6 +178,7 @@ export const updateUserDetails = async (
 
     if (name) user.name = name;
     if (email) user.email = email;
+    if (college !== undefined) user.college = college;
 
     await user.save();
 
@@ -226,6 +227,21 @@ export const syncAllStats = async (req: Request, res: Response) => {
     const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
+    }
+
+    // Smart Caching Check (15 minutes threshold unless forced)
+    const force = req.query.force === "true" || req.body.force === true;
+    const cooldownPeriod = 15 * 60 * 1000; // 15 minutes in milliseconds
+    const lastSyncedTime = user.lastSyncedAt ? new Date(user.lastSyncedAt).getTime() : 0;
+    const hasSyncedRecently = lastSyncedTime && (Date.now() - lastSyncedTime < cooldownPeriod);
+
+    if (hasSyncedRecently && !force) {
+      return res.json({
+        success: true,
+        isCached: true,
+        message: "Data loaded from cache. You can sync again in 15 minutes.",
+        user,
+      });
     }
 
     const { usernames } = user;
@@ -287,6 +303,7 @@ export const syncAllStats = async (req: Request, res: Response) => {
       (cfStats?.totalProblemsSolved || 0) + 
       (ccStats.solved || 0);
 
+    user.lastSyncedAt = new Date();
     await user.save();
 
     return res.json({

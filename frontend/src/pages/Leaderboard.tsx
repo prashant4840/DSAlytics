@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axiosFetch from "../lib/axiosFetch";
 import { LeaderboardResponse } from "../lib/types";
@@ -13,11 +13,13 @@ const Leaderboard = () => {
     useState<LeaderboardResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isRequested, setIsRequested] = useState<boolean>(false);
+
+  // Filter States
+  const [sortBy, setSortBy] = useState<"solved" | "overall">("solved");
+  const [collegeSearch, setCollegeSearch] = useState("");
+  const [selectedPlatform, setSelectedPlatform] = useState("");
 
   const fetchLeaderboardData = async (page: number) => {
-    if (isRequested) return;
-    setIsRequested(true);
     setIsLoading(true);
     setError(null);
     try {
@@ -28,7 +30,11 @@ const Leaderboard = () => {
 
       const { data } = await axiosFetch.post(
         `/leaderboard/${page}`,
-        {},
+        {
+          sortBy,
+          college: collegeSearch || undefined,
+          platform: selectedPlatform || undefined,
+        },
         { headers }
       );
       if (data) setLeaderboardData(data);
@@ -36,22 +42,24 @@ const Leaderboard = () => {
       setError("Failed to fetch leaderboard data");
     } finally {
       setIsLoading(false);
-      setTimeout(() => {
-        setIsRequested(false);
-      }, 1000);
     }
   };
 
   useEffect(() => {
     fetchLeaderboardData(currentPage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage]);
+  }, [currentPage, sortBy, selectedPlatform]);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setCurrentPage(1);
+    fetchLeaderboardData(1);
+  };
 
   const handleProfileClick = (userId: string) => {
     navigate(`/preview/${userId}`);
   };
 
-  // Pagination controls with animation
   const renderPaginationNumbers = () => {
     if (!leaderboardData?.totalPages) return null;
     const pages = [];
@@ -78,7 +86,6 @@ const Leaderboard = () => {
     return pages;
   };
 
-  // Enhanced loading skeleton with wave animation
   const LoadingSkeleton = () => (
     <div>
       {[...Array(10)].map((_, idx) => (
@@ -109,28 +116,7 @@ const Leaderboard = () => {
           }}
           className="px-6 py-2 bg-blue-600 text-white rounded-lg transition-all duration-300
             hover:bg-blue-700 hover:shadow-lg transform hover:scale-105">
-          {isRequested ? (
-            <div role="status">
-              <svg
-                aria-hidden="true"
-                className="w-6 mx-2 text-gray-200 animate-spin fill-blue-600"
-                viewBox="0 0 100 101"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                  fill="currentColor"
-                />
-                <path
-                  d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                  fill="currentFill"
-                />
-              </svg>
-              <span className="sr-only">Loading...</span>
-            </div>
-          ) : (
-            <p>Retry</p>
-          )}
+          Retry
         </button>
       </div>
     );
@@ -142,8 +128,66 @@ const Leaderboard = () => {
         <div className="absolute top-0 left-0 w-full h-full bg-white opacity-10 transform -skew-y-6"></div>
         <h2 className="relative text-4xl font-bold mb-2">Global Leaderboard</h2>
         <p className="relative text-blue-100 text-sm">
-          Ranking based on total problems solved
+          Ranking based on {sortBy === "overall" ? "DEVlytics Career Score" : "total problems solved"}
         </p>
+      </div>
+
+      {/* Filter Cockpit */}
+      <div className="bg-zinc-50 border-b border-gray-100 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        {/* Sort Select */}
+        <div className="flex flex-col gap-1.5 flex-1 min-w-[200px]">
+          <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Sort Candidates By</label>
+          <select
+            value={sortBy}
+            onChange={(e) => {
+              setSortBy(e.target.value as "solved" | "overall");
+              setCurrentPage(1);
+            }}
+            className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-zinc-700 transition duration-200">
+            <option value="solved">Total Problems Solved</option>
+            <option value="overall">DEVlytics Career Score</option>
+          </select>
+        </div>
+
+        {/* College Search Form */}
+        <form onSubmit={handleSearchSubmit} className="flex flex-col gap-1.5 flex-[1.5] min-w-[250px]">
+          <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">College / University</label>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="Search e.g. Stanford, MIT..."
+              value={collegeSearch}
+              onChange={(e) => setCollegeSearch(e.target.value)}
+              className="flex-1 bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-zinc-700 transition duration-200"
+            />
+            <button
+              type="submit"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg px-4 py-2 text-sm shadow-md transition duration-200 flex items-center gap-1.5">
+              <Search size={14} />
+              Apply
+            </button>
+          </div>
+        </form>
+
+        {/* Platform Selection */}
+        <div className="flex flex-col gap-1.5 flex-1 min-w-[200px]">
+          <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Filter By Active Platform</label>
+          <select
+            value={selectedPlatform}
+            onChange={(e) => {
+              setSelectedPlatform(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-zinc-700 transition duration-200">
+            <option value="">All Platforms</option>
+            <option value="leetcode">LeetCode</option>
+            <option value="codeforces">Codeforces</option>
+            <option value="codechef">CodeChef</option>
+            <option value="gfg">GeeksForGeeks</option>
+            <option value="github">GitHub</option>
+            <option value="interviewbit">InterviewBit</option>
+          </select>
+        </div>
       </div>
 
       {leaderboardData?.currentUser && (
@@ -163,25 +207,31 @@ const Leaderboard = () => {
         ) : (
           <div className="transition-all duration-500">
             <div className="p-4 font-medium text-gray-600">Global Ranking</div>
-            {leaderboardData?.users
-              .filter((user) => user.totalSolved > 0)
-              .map((user, index) => (
-                <div
-                  key={user.userId}
-                  className="transform transition-all duration-500"
-                  style={{
-                    animationDelay: `${index * 100}ms`,
-                    opacity: 1 - index * 0.02,
-                  }}>
-                  <UserRow
-                    user={user}
-                    isCurrentUser={
-                      user.userId === leaderboardData?.currentUser?.userId
-                    }
-                    handleProfileClick={handleProfileClick}
-                  />
-                </div>
-              ))}
+            {leaderboardData?.users && leaderboardData.users.length > 0 ? (
+              leaderboardData.users
+                .filter((user) => user.totalSolved > 0)
+                .map((user, index) => (
+                  <div
+                    key={user.userId}
+                    className="transform transition-all duration-500"
+                    style={{
+                      animationDelay: `${index * 100}ms`,
+                      opacity: 1 - index * 0.02,
+                    }}>
+                    <UserRow
+                      user={user}
+                      isCurrentUser={
+                        user.userId === leaderboardData?.currentUser?.userId
+                      }
+                      handleProfileClick={handleProfileClick}
+                    />
+                  </div>
+                ))
+            ) : (
+              <div className="p-8 text-center text-gray-500 text-sm">
+                No active candidate profiles found matching current filters.
+              </div>
+            )}
           </div>
         )}
       </div>

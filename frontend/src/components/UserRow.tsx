@@ -122,15 +122,28 @@ const UserRow = ({
 
       <div className="flex-1 ml-4">
         <div className={`font-bold ${rankDetails.textColor}`}>{user.name}</div>
-        <span
-          className={`text-sm inline-flex items-center rounded-full px-2 bg-zinc-200 border opacity-90 font-semibold`}>
-          {rankDetails.title}
-        </span>
+        <div className="flex flex-wrap gap-1 mt-1">
+          <span
+            className={`text-xs inline-flex items-center rounded-full px-2 py-0.5 bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold`}>
+            {rankDetails.title}
+          </span>
+          {user.college && (
+            <span className="text-xs inline-flex items-center rounded-full px-2 py-0.5 bg-zinc-100 border text-zinc-600 font-medium">
+              🏫 {user.college}
+            </span>
+          )}
+        </div>
       </div>
-      <div className="flex flex-col">
-        <div className="text-sm text-gray-600">
-          <p className=" text-lg text-black text-center">{user.totalSolved}</p>
-          <p>Problems solved</p>
+      <div className="flex sm:space-x-6 space-x-2 text-right">
+        {user.overallScore !== undefined && (
+          <div className="text-[10px] text-gray-500 flex flex-col items-center">
+            <p className="text-sm font-extrabold text-indigo-600">{user.overallScore}</p>
+            <p>Career Score</p>
+          </div>
+        )}
+        <div className="text-[10px] text-gray-500 flex flex-col items-center">
+          <p className="text-sm font-extrabold text-gray-900">{user.totalSolved}</p>
+          <p>Problems Solved</p>
         </div>
       </div>
     </div>

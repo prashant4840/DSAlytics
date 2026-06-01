@@ -21,28 +21,29 @@ export const generateInsights = async (
   leetcodeStats: { solved: number; rating?: number },
   codeforcesStats: { rating?: number }
 ): Promise<{ weaknesses: Weakness[]; recommendations: Recommendation[] }> => {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const openaiApiKey = process.env.OPENAI_API_KEY;
+  const geminiApiKey = process.env.GEMINI_API_KEY;
 
-  if (apiKey) {
+  const prompt = `Analyze this developer profile and return a JSON object with:
+  1. An array "weaknesses" where each item has: "title", "category", "level" ("High" | "Medium" | "Low"), and "description".
+  2. An array "recommendations" where each item has: "title", "category", "description", and "actionUrl".
+
+  Developer Stats:
+  - Overall Score: ${scores.overall}/1000
+  - DSA Score: ${scores.dsa}/100
+  - Development Score: ${scores.development}/100
+  - Consistency Score: ${scores.consistency}/100
+  - Problem Solving Score: ${scores.problemSolving}/100
+  - Project Quality Score: ${scores.projectQuality}/100
+  - Contest Rating Score: ${scores.contestPerformance}/100
+  - Open Source Score: ${scores.openSource}/100
+  - GitHub Repositories: ${githubStats.repos}, Commits: ${githubStats.commits}, Stars: ${githubStats.stars}
+  - LeetCode Solved: ${leetcodeStats.solved}, Rating: ${leetcodeStats.rating || 'N/A'}
+  - Codeforces Rating: ${codeforcesStats.rating || 'N/A'}`;
+
+  // 1. Try OpenAI if key is present
+  if (openaiApiKey) {
     try {
-      // Structure the prompt with stats
-      const prompt = `Analyze this developer profile and return a JSON object with:
-      1. An array "weaknesses" where each item has: "title", "category", "level" ("High" | "Medium" | "Low"), and "description".
-      2. An array "recommendations" where each item has: "title", "category", "description", and "actionUrl".
-
-      Developer Stats:
-      - Overall Score: ${scores.overall}/1000
-      - DSA Score: ${scores.dsa}/100
-      - Development Score: ${scores.development}/100
-      - Consistency Score: ${scores.consistency}/100
-      - Problem Solving Score: ${scores.problemSolving}/100
-      - Project Quality Score: ${scores.projectQuality}/100
-      - Contest Rating Score: ${scores.contestPerformance}/100
-      - Open Source Score: ${scores.openSource}/100
-      - GitHub Repositories: ${githubStats.repos}, Commits: ${githubStats.commits}, Stars: ${githubStats.stars}
-      - LeetCode Solved: ${leetcodeStats.solved}, Rating: ${leetcodeStats.rating || 'N/A'}
-      - Codeforces Rating: ${codeforcesStats.rating || 'N/A'}`;
-
       const aiResponse = await axios.post(
         "https://api.openai.com/v1/chat/completions",
         {
@@ -61,7 +62,7 @@ export const generateInsights = async (
         },
         {
           headers: {
-            Authorization: `Bearer ${apiKey}`,
+            Authorization: `Bearer ${openaiApiKey}`,
             "Content-Type": "application/json",
           },
           timeout: 10000,
@@ -73,7 +74,44 @@ export const generateInsights = async (
         return result;
       }
     } catch (e: any) {
-      console.warn("Failed to generate insights using OpenAI, falling back to rule engine:", e.message);
+      console.warn("Failed to generate insights using OpenAI, trying other options:", e.message);
+    }
+  }
+
+  // 2. Try Gemini if key is present
+  if (geminiApiKey) {
+    try {
+      const aiResponse = await axios.post(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
+        {
+          contents: [
+            {
+              parts: [
+                {
+                  text: prompt + "\n\nOutput only valid JSON conforming to the structural spec."
+                }
+              ]
+            }
+          ],
+          generationConfig: {
+            responseMimeType: "application/json"
+          }
+        },
+        {
+          headers: {
+            "Content-Type": "application/json"
+          },
+          timeout: 10000
+        }
+      );
+
+      const responseText = aiResponse.data.candidates[0].content.parts[0].text;
+      const result = JSON.parse(responseText);
+      if (result.weaknesses && result.recommendations) {
+        return result;
+      }
+    } catch (e: any) {
+      console.warn("Failed to generate insights using Gemini, falling back to rule engine:", e.message);
     }
   }
 

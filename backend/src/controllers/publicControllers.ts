@@ -44,24 +44,35 @@ export const previewPlatformData = async (req: Request, res: Response) => {
 export const leaderboardController = async (req: Request, res: Response) => {
   try {
     const { page } = req.params;
+    const { sortBy, college, platform } = req.body;
     const pageNumber = parseInt(page, 10) || 1;
     const itemsPerPage = 10;
     const token = req.headers.authorization?.split(" ")[1];
 
-    let currentUser = null;
+    let currentUser: {
+      userId: string;
+      name: string;
+      pfp: string;
+      totalSolved: number;
+      overallScore: number;
+      college: string;
+      rank: number;
+    } | null = null;
 
     if (token) {
       try {
         // @ts-ignore
         const { id } = jwt.verify(token, process.env.JWT_SECRET!);
-        const user = await User.findById(id).select("_id name pfp totalSolved");
+        const user = await User.findById(id).select("_id name pfp totalSolved skillScores college");
         if (user) {
           currentUser = {
-            userId: user._id,
+            userId: user._id.toString(),
             name: user.name,
             pfp: user.pfp || "",
             totalSolved: user.totalSolved || 0,
-            rank: 0, // This will be calculated later
+            overallScore: user.skillScores?.overall || 0,
+            college: user.college || "",
+            rank: 0,
           };
         }
       } catch (err) {
@@ -69,14 +80,27 @@ export const leaderboardController = async (req: Request, res: Response) => {
       }
     }
 
-    const totalUsers = await User.countDocuments({
-      totalSolved: { $exists: true },
-    });
+    const query: any = {};
+    query.totalSolved = { $exists: true };
 
+    if (college) {
+      query.college = { $regex: college, $options: "i" };
+    }
+
+    if (platform) {
+      query[`usernames.${platform}`] = { $ne: "", $exists: true };
+    }
+
+    const sortField = sortBy === "overall" ? "skillScores.overall" : "totalSolved";
+    const sortQuery: any = {};
+    sortQuery[sortField] = -1;
+    sortQuery._id = 1;
+
+    const totalUsers = await User.countDocuments(query);
     const totalPages = Math.ceil(totalUsers / itemsPerPage);
 
-    const users = await User.find({ totalSolved: { $exists: true } })
-      .sort({ totalSolved: -1, _id: 1 })
+    const users = await User.find(query)
+      .sort(sortQuery)
       .skip((pageNumber - 1) * itemsPerPage)
       .limit(itemsPerPage);
 
@@ -85,19 +109,36 @@ export const leaderboardController = async (req: Request, res: Response) => {
       name: user.name,
       pfp: user.pfp || "",
       totalSolved: user.totalSolved || 0,
+      overallScore: user.skillScores?.overall || 0,
+      college: user.college || "",
       rank: (pageNumber - 1) * itemsPerPage + index + 1,
     }));
 
     if (currentUser) {
-      // Calculate the rank of the current user
-      const allUsers = await User.find({ totalSolved: { $exists: true } }).sort(
-        { totalSolved: -1 }
-      );
+      const targetUserId = currentUser.userId;
+      const allUsers = await User.find(query).sort(sortQuery);
       const currentUserRank =
         allUsers.findIndex(
-          (u) => u._id.toString() === currentUser.userId.toString()
+          (u) => u._id.toString() === targetUserId
         ) + 1;
-      currentUser.rank = currentUserRank;
+      
+      const loggedInUser = allUsers.find(
+        (u) => u._id.toString() === targetUserId
+      );
+
+      if (loggedInUser && currentUserRank > 0) {
+        currentUser = {
+          userId: loggedInUser._id.toString(),
+          name: loggedInUser.name,
+          pfp: loggedInUser.pfp || "",
+          totalSolved: loggedInUser.totalSolved || 0,
+          overallScore: loggedInUser.skillScores?.overall || 0,
+          college: loggedInUser.college || "",
+          rank: currentUserRank,
+        };
+      } else {
+        currentUser = null;
+      }
     }
 
     res.json({

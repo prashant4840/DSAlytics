@@ -76,7 +76,7 @@ const PreviewPage = () => {
       const image = canvas.toDataURL("image/png");
       const link = document.createElement("a");
       link.href = image;
-      link.download = `${user?.name}-dsastats.png`;
+      link.download = `${user?.name}-devlytics.png`;
       link.click();
     } catch (error) {
       console.error("Error generating image:", error);
@@ -248,6 +248,37 @@ export const backgrounds = {
       </div>
     ),
     preview: "Grid with Glow",
+  },
+  sleekMidnight: {
+    component: () => (
+      <div className="h-full absolute w-full rounded-xl bg-gradient-to-br from-zinc-950 via-zinc-900 to-black border border-zinc-800" />
+    ),
+    preview: "Sleek Midnight",
+  },
+  neonCyberpunk: {
+    component: () => (
+      <div className="h-full absolute w-full rounded-xl bg-black overflow-hidden border border-fuchsia-800/40">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f1a3a_1px,transparent_1px),linear-gradient(to_bottom,#1f1a3a_1px,transparent_1px)] bg-[size:2rem_2rem] opacity-35" />
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-fuchsia-600 rounded-full filter blur-[120px] opacity-30" />
+        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-violet-600 rounded-full filter blur-[120px] opacity-30" />
+      </div>
+    ),
+    preview: "Neon Cyberpunk",
+  },
+  minimalistSnow: {
+    component: () => (
+      <div className="h-full absolute w-full rounded-xl bg-[#fafafa] bg-[radial-gradient(#e5e5e5_1px,transparent_1px)] bg-[size:16px_16px] border border-zinc-200" />
+    ),
+    preview: "Minimalist Snow",
+  },
+  purpleHaze: {
+    component: () => (
+      <div className="h-full absolute w-full rounded-xl bg-gradient-to-tr from-violet-950 via-indigo-950 to-zinc-950 overflow-hidden border border-purple-800/30">
+        <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-purple-500 rounded-full filter blur-[100px] opacity-25" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-indigo-500 rounded-full filter blur-[100px] opacity-25" />
+      </div>
+    ),
+    preview: "Purple Haze",
   },
 };
 

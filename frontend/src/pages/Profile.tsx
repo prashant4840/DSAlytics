@@ -8,6 +8,8 @@ import { ProfileHeader } from "../components/ui/ProfileHeader";
 import Toast from "../components/ui/Toast";
 import { Link } from "react-router-dom";
 import { RefreshCw, AlertTriangle, Compass, Trophy, Brain, Layers } from "lucide-react";
+import { ActivityHeatmap } from "../components/ActivityHeatmap";
+import { ContestCalendar } from "../components/ContestCalendar";
 import {
   Radar,
   RadarChart,
@@ -65,7 +67,7 @@ export const Profile = () => {
     fetchData();
   }, [token]);
 
-  const handleSyncAllStats = async () => {
+  const handleSyncAllStats = async (force: boolean = false) => {
     if (!token) return;
     setIsSyncing(true);
     setError(null);
@@ -74,13 +76,17 @@ export const Profile = () => {
     try {
       const { data } = await axiosFetch.post(
         "/api/user/sync",
-        {},
+        { force },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (data.success && data.user) {
         setUser(data.user);
-        setToastMessage("Dashboard synced successfully!");
+        if (data.isCached) {
+          setToastMessage("Serving cached statistics. Use Force Sync to fetch live data.");
+        } else {
+          setToastMessage("Dashboard synced successfully!");
+        }
         
         // Also fetch platform stats to update cards
         const platformDataResponse = await axiosFetch.get<UserStats>(
@@ -95,7 +101,7 @@ export const Profile = () => {
       setError("Sync failed: " + (err.response?.data?.message || err.message));
     } finally {
       setIsSyncing(false);
-      setTimeout(() => setToastMessage(null), 3000);
+      setTimeout(() => setToastMessage(null), 4000);
     }
   };
 
@@ -306,6 +312,11 @@ export const Profile = () => {
     { subject: "Contests", score: scores.contestPerformance, fullMark: 100 },
   ];
 
+  const lastSyncedTime = user?.lastSyncedAt ? new Date(user.lastSyncedAt).getTime() : 0;
+  const cooldownPeriod = 15 * 60 * 1000;
+  const isCooldownActive = lastSyncedTime && (Date.now() - lastSyncedTime < cooldownPeriod);
+  const minutesRemaining = isCooldownActive ? Math.ceil((cooldownPeriod - (Date.now() - lastSyncedTime)) / (60 * 1000)) : 0;
+
   return (
     <>
       <div className="max-w-7xl mx-auto px-4 py-8 mt-12 animate-slide-down">
@@ -321,14 +332,35 @@ export const Profile = () => {
               Manage connected coding accounts and view your AI career intelligence report.
             </p>
           </div>
-          <button
-            onClick={handleSyncAllStats}
-            disabled={isSyncing}
-            className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-4 rounded-xl shadow-md transition duration-200 disabled:opacity-50"
-          >
-            <RefreshCw className={`w-5 h-5 ${isSyncing ? "animate-spin" : ""}`} />
-            <span>{isSyncing ? "Syncing Platforms..." : "Sync All Platforms"}</span>
-          </button>
+          
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            {isCooldownActive && (
+              <span className="text-xs font-semibold text-zinc-600 bg-zinc-100 border border-zinc-200 px-3 py-1.5 rounded-xl shadow-sm">
+                ⏱️ Cooldown: {minutesRemaining}m remaining
+              </span>
+            )}
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleSyncAllStats(false)}
+                disabled={isSyncing}
+                className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-4 rounded-xl shadow-md transition duration-200 disabled:opacity-50 text-sm"
+              >
+                <RefreshCw className={`w-4 h-4 ${isSyncing ? "animate-spin" : ""}`} />
+                <span>{isSyncing ? "Syncing..." : isCooldownActive ? "Load Cached Stats" : "Sync All Platforms"}</span>
+              </button>
+              {isCooldownActive && (
+                <button
+                  onClick={() => handleSyncAllStats(true)}
+                  disabled={isSyncing}
+                  title="Bypass cache and force scrape all external accounts"
+                  className="flex items-center space-x-1.5 border border-indigo-200 text-indigo-600 hover:bg-indigo-50 font-medium py-2.5 px-3 rounded-xl shadow-sm transition duration-200 text-sm"
+                >
+                  <RefreshCw className={`w-4 h-4 text-indigo-500 ${isSyncing ? "animate-spin" : ""}`} />
+                  <span>Force Sync</span>
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Profile Header */}
@@ -439,6 +471,19 @@ export const Profile = () => {
             </div>
           </div>
 
+        </div>
+
+        {/* 3. Consistency Heatmap & Upcoming Contests calendar */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+          <div className="lg:col-span-2">
+            <ActivityHeatmap 
+              consistencyScore={user?.skillScores?.consistency || 0} 
+              totalSolved={user?.totalSolved || 0} 
+            />
+          </div>
+          <div className="lg:col-span-1">
+            <ContestCalendar />
+          </div>
         </div>
 
         {/* Mentor recommendations & Roadmaps */}
