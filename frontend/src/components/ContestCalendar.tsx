@@ -45,8 +45,8 @@ export const ContestCalendar: React.FC = () => {
           .slice(0, 5);
 
         setContests(filtered);
-      } catch (err: any) {
-        console.error("Error loading contests:", err.message);
+      } catch (err) {
+        console.error("Error loading contests:", err instanceof Error ? err.message : String(err));
         setError("Contest calendar unavailable");
       } finally {
         setIsLoading(false);

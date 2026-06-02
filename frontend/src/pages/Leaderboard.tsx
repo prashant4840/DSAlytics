@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axiosFetch from "../lib/axiosFetch";
@@ -19,7 +19,7 @@ const Leaderboard = () => {
   const [collegeSearch, setCollegeSearch] = useState("");
   const [selectedPlatform, setSelectedPlatform] = useState("");
 
-  const fetchLeaderboardData = async (page: number) => {
+  const fetchLeaderboardData = useCallback(async (page: number) => {
     setIsLoading(true);
     setError(null);
     try {
@@ -43,12 +43,11 @@ const Leaderboard = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [sortBy, collegeSearch, selectedPlatform]);
 
   useEffect(() => {
     fetchLeaderboardData(currentPage);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, sortBy, selectedPlatform]);
+  }, [currentPage, fetchLeaderboardData]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();

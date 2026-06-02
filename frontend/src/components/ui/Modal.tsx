@@ -40,13 +40,13 @@ export const ModalImg: React.FC<{
         onClick={onClose}
       />
       <div className="relative bg-white rounded-lg w-full max-w-md mx-4">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10">
+          ✕
+        </button>
         <div className="p-4 border-b">
           <h2 className="text-xl font-semibold">{title}</h2>
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-            ✕
-          </button>
         </div>
         <div className="p-4">{children}</div>
       </div>

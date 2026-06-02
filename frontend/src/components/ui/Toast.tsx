@@ -7,9 +7,10 @@ interface ToastProps {
   message: string;
   variant?: ToastVariant;
   duration?: number;
+  isStacked?: boolean;
 }
 
-const Toast = ({ message, variant = "info", duration = 5000 }: ToastProps) => {
+const Toast = ({ message, variant = "info", duration = 5000, isStacked = false }: ToastProps) => {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
@@ -63,7 +64,7 @@ const Toast = ({ message, variant = "info", duration = 5000 }: ToastProps) => {
   } = variants[variant];
 
   return (
-    <div className="fixed bottom-8 right-8 z-50 animate-slide-in">
+    <div className={isStacked ? "animate-slide-in" : "fixed bottom-8 right-8 z-50 animate-slide-in"}>
       <div
         className={`flex items-center gap-2 p-4 rounded-lg border ${bgColor} ${borderColor} ${textColor} shadow-lg max-w-md`}
         role="alert">

@@ -320,8 +320,10 @@ export const Profile = () => {
   return (
     <>
       <div className="max-w-7xl mx-auto px-4 py-8 mt-12 animate-slide-down">
-        {error && <Toast message={error} variant="error" />}
-        {toastMessage && <Toast message={toastMessage} variant="success" />}
+        <div className="fixed bottom-8 right-8 z-50 flex flex-col gap-3 pointer-events-none">
+          {error && <div className="pointer-events-auto"><Toast message={error} variant="error" isStacked /></div>}
+          {toastMessage && <div className="pointer-events-auto"><Toast message={toastMessage} variant="success" isStacked /></div>}
+        </div>
 
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div>
